@@ -1,16 +1,27 @@
 {
   "name": "@laragear/webpass",
   "version": "1.0.0",
-  "description": "A WebAuthn API for browsers",
-  "repository": "laragear/webpass",
+  "description": "The most simple WebAuthn (Passkeys) helper for browsers.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Laragear/webpass.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Laragear/webpass/issues"
+  },
+  "homepage": "https://github.com/Laragear/webpass",
   "main": "src/index.ts",
   "scripts": {
     "build": "rollup --config --sourcemap",
     "test": "vitest"
   },
   "sideEffects": false,
-  "keywords": [],
-  "author": "",
+  "keywords": ["webauthn", "passkeys", "authentication", "auth", "security", "browser"],
+  "author": {
+    "name": "Italo Israel Baeza Cabrera",
+    "email": "darkghosthunter@gmail.com",
+    "url": "https://github.com/DarkGhostHunter"
+  },
   "type": "module",
   "license": "MIT",
   "dependencies": {

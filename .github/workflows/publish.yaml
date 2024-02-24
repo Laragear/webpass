@@ -1,0 +1,43 @@
+name: Publish Package on Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update package.json version
+        run: |
+          # Extract the version from the release tag
+          VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          # Update package.json with the extracted version
+          npm version "$VERSION"
+          # Commit the updated package.json
+          git commit -m "Update package.json version to $VERSION" package.json
+          # Push the changes
+          git push origin HEAD
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish package to GitHub Packages
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
