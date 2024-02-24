@@ -1,0 +1,34 @@
+name: Publish Package on Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install the dependencies
+        run: npm ci
+
+      - name: Test the package
+        run: npm run test
+
+      - name: Build the package
+        run: npm run build
+
+      - name: Publish package to NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
