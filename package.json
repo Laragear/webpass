@@ -9,6 +9,9 @@
   "bugs": {
     "url": "https://github.com/Laragear/webpass/issues"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "homepage": "https://github.com/Laragear/webpass",
   "main": "src/index.ts",
   "scripts": {
@@ -16,7 +19,14 @@
     "test": "vitest"
   },
   "sideEffects": false,
-  "keywords": ["webauthn", "passkeys", "authentication", "auth", "security", "browser"],
+  "keywords": [
+    "webauthn",
+    "passkeys",
+    "authentication",
+    "auth",
+    "security",
+    "browser"
+  ],
   "author": {
     "name": "Italo Israel Baeza Cabrera",
     "email": "darkghosthunter@gmail.com",
