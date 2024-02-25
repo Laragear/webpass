@@ -1,5 +1,5 @@
 {
-  "name": "@laragear/webpass",
+  "name": "laragear-webpass",
   "version": "1.0.0",
   "description": "The most simple WebAuthn (Passkeys) helper for browsers.",
   "repository": {
