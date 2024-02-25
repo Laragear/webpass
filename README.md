@@ -3,7 +3,7 @@
 The most simple WebAuthn (Passkeys) helper for browsers.
 
 ```js
-import Webpass from '@laragear/webpass'
+import Webpass from 'laragear-webpass'
 
 const { user, success } = await Webpass.assert()
 
@@ -17,35 +17,31 @@ if (success) {
 Use your favorite package manager to install it in your project.
 
 ```shell
-npm i @laragear/webpass
+npm i laragear-webpass
 ```
 
 ```shell
-pnpm i @laragear/webpass
+pnpm i laragear-webpass
 ```
 
 ```shell
-yarn add @laragear/webpass
+yarn add laragear-webpass
 ```
 
 ```shell
-bum @laragear/webpass
+bum laragear-webpass
 ```
 
 Then, in your project, you can import is as a module.
 
 ```js
-// ESM / Typescript
-import Webpass from "@laragear/webpass"
-
-// CommonJS
-const Webpass = require('@laragear/webpass')
+import Webpass from "laragear-webpass"
 ```
 
-If you're not using a bundler, you may prefer to use a CDN directly into your HTML web page.
+If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you may prefer to use a CDN directly into your HTML web page.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@latest" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/laragear-webpass@1/dist/webpass.js" defer></script>
 
 <button type="button" onclick="Webpass.assert()">
     Log in
@@ -57,7 +53,7 @@ If you're not using a bundler, you may prefer to use a CDN directly into your HT
 First, you should check if the browser supports WebAuthn (also called _Passkeys_) and [user verification](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/isUserVerifyingPlatformAuthenticatorAvailable_static). You can easily do it with `isSupported()` and `isUnsupported()`.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 if (Webpass.isSupported()) {
     return "Your browser supports WebAuthn, just click Login and you're done!"
@@ -79,7 +75,7 @@ After verifying the device, you're free to use Webpass.
 The most straightforward way to use Webpass is to execute `Webpass.attest()` and `Webpass.assert()` to create and verify credentials, respectively.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 // Create new credentials for a logged in user
 const { credential, success, error } = await Webpass.attest("/auth/webauthn/attest")
@@ -105,7 +101,7 @@ There is a lot of assumptions with the simple approach:
 You may also change the ceremony paths by your custom one.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 // Register credentials:
 const { credential, success, error } = await Webpass.attest(
@@ -127,7 +123,7 @@ Attestation is the _ceremony_ to create credentials. In a nutshell, the browser 
 Start an attestation using `attest()`, with the paths where the attestation options are retrieved, and the attestation response is sent back.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const { success, data, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
 ```
@@ -141,7 +137,7 @@ The attestation object contains:
 While the `data` object will contain the response from the attestation server, most servers won't return body content on HTTP 201 or 206 codes. Others will return the ID of the credential created for redirection (like `/profile/devices/126`). For that matter, you can use the `credential` alias, or the `id` alias if you want to extract only the ID or UUID property.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const { id, success, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
 
@@ -159,7 +155,7 @@ Assertion is the _ceremony_ to check if a device has the correct credential. In 
 Start an assertion using the `assert()` method, with the paths where the assertion options are retrieved, and the assertion response is sent back.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const { success, data, error } = await Webpass.assert("/auth/assert-options", "/auth/assert")
 ```
@@ -175,7 +171,7 @@ The first request to the server is usually the most important. If your server in
 Otherwise, you may need to point out the user identifier, like its email, so the Authenticator can pick up the Non-Resident Keys. For that, you may [configure the ceremony](#ceremony-configuration) with a body:
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const { data, success, error } = await Webpass.assert({
     path: "/auth/assert-options",
@@ -194,7 +190,7 @@ const { data, success, error } = await Webpass.assert({
 Usually, WebAuthn servers will return the user, a token, or even custom JSON with both after completing an assertion. You may use the `user` alias, or use `token` if the response is a single string for further authentication.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 import { useAuth } from '#/composables'
 
 const { token, success, error } = await Webpass.assert()
@@ -213,7 +209,7 @@ For example, there may be scenarios where you will want to add data to one of th
 This works for both Attestation and Assertion, and available for both requests of each ceremony.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const attestOptionsConfig = {
     path: "/auth/attest-options",
@@ -242,7 +238,7 @@ const { data, success, error } = await Webpass.attest(attestOptionsConfig, asser
 You may want to use `try-catch` blocks, or receive the raw data from the server on success. You can do that using the `attestRaw()` and `assertRaw()` methods.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 let data = null
 
@@ -258,7 +254,7 @@ try {
 Webpass uses [Oh My Fetch](https://unjs.io/packages/ofetch) library to push requests and receive responses from the server during WebAuthn ceremonies. You may push your custom configuration for the `ofetch` helper directly when creating a Webpass instance from scratch.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const webpass = Webpass.create({
     baseURL: 'https://myapp.com/passkeys',
@@ -273,7 +269,7 @@ const result = webpass.assert()
 You may also pass `ofetch` configuration in a case-by-case-basis for attestation and assertion options and responses.
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const assert = Webpass.assert(
     {
@@ -302,7 +298,7 @@ Webpass always instances itself with a default configuration that should work on
 You can create a custom instance with a custom configuration to ease the usage of attestations and assertions on multiple endpoints, or just to slim down your login/register views. All the keys, except the `routes` key, are pushed to [Oh My Fetch](https://unjs.io/packages/ofetch).
 
 ```js
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const webauthn = Webpass.create({
     method: "post",
@@ -347,7 +343,7 @@ You can easily create a lazy WebAuthn ceremony using `useLazyAsyncData`, and the
 </template>
 
 <script setup>
-import Webpass from "@laragear/webpass"
+import Webpass from "laragear-webpass"
 
 const isSupported = Webpass.isSupported()
 
@@ -372,7 +368,7 @@ Yes, import it as a script in your HTML `<header>` tag.
 ```html
 <head>
     <!-- ... -->
-    <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@latest" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/laragear-webpass@latest" defer></script>
 </head>
 ```
 
