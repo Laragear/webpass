@@ -22,16 +22,14 @@ jobs:
         with:
           node-version: latest
           scope: '@laragear'
+          registry-url: 'https://registry.npmjs.org'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build package
-        run: npm run build
+      - name: Install, test and build the package
+        run: npm ci
 
       - name: Publish package to NPM
         run: npm publish --provenance --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

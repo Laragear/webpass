@@ -10,7 +10,7 @@
     "url": "https://github.com/Laragear/webpass/issues"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org"
   },
   "homepage": "https://github.com/Laragear/webpass",
   "main": "src/index.ts",
