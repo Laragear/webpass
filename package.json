@@ -16,7 +16,9 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "rollup --config --sourcemap",
-    "test": "vitest"
+    "dev": "vitest",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
   },
   "sideEffects": false,
   "keywords": [

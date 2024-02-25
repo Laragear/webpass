@@ -19,8 +19,14 @@ jobs:
           node-version: latest
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install, test and build the package
+      - name: Install the dependencies
         run: npm ci
+
+      - name: Test the package
+        run: npm run test
+
+      - name: Build the package
+        run: npm run build
 
       - name: Publish package to NPM
         run: npm publish --access public
