@@ -124,7 +124,7 @@ const { credential, success, error } = await Webpass.attest(
 
 // Login with credentials:
 const { user, success, error, pending } = await Webpass.assert(
-    "auth/webauthn/assert-options", "/auth/webauthn/assert"
+    "/auth/webauthn/assert-options", "/auth/webauthn/assert"
 )
 ```
 
