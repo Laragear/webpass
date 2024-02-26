@@ -9,6 +9,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,6 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
+          scope: '@laragear'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install the dependencies
