@@ -64,6 +64,20 @@ If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you ma
 </button>
 ```
 
+You may also use the `webpass.mjs` if you're using ECMAScript modules in your project.
+
+```html
+<script type="module">
+    import Webpass from "https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.mjs"
+
+    window.Webpass = Webpass
+</script>
+
+<button type="button" onclick="Webpass.assert()">
+    Log in
+</button>
+```
+
 ## Usage
 
 First, you should check if the browser supports WebAuthn (also called _Passkeys_) and [user verification](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/isUserVerifyingPlatformAuthenticatorAvailable_static). You can easily do it with `isSupported()` and `isUnsupported()`.
