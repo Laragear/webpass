@@ -57,7 +57,7 @@ import Webpass from "@laragear/webpass"
 If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you may prefer to use a CDN directly into your HTML web page.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@1.*/dist/webpass.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.js" defer></script>
 
 <button type="button" onclick="Webpass.assert()">
     Log in
@@ -180,9 +180,9 @@ The assertion object contains:
 - `data`, the data received from the attestation
 - `error`, if the attestation was unsuccessful by an error
 
-The first request to the server is usually the most important. If your server instructed to create [discoverable credentials](https://www.w3.org/TR/webauthn-2/#enum-residentKeyRequirement) (Resident Keys) in the device, you won't need anything more than the path to receive the assertion options as the device will automatically find the correct one.
+The first request to the server is the most important. If your server instructed the authenticator to create [discoverable credentials](https://www.w3.org/TR/webauthn-2/#enum-residentKeyRequirement) (called "Resident Keys") in the device, you won't need anything more than the path to receive the assertion options as the device will automatically find the correct one.
 
-Otherwise, you may need to point out the user identifier, like its email, so the Authenticator can pick up the Non-Resident Keys. For that, you may [configure the ceremony](#ceremony-configuration) with a body:
+Otherwise, you may need to point out the user identifier, like its email, so the Authenticator can pick up the correct Non-Resident Keys. For that, you may [configure the ceremony](#ceremony-configuration) with a body your server can pick up.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -197,11 +197,13 @@ const { data, success, error } = await Webpass.assert({
 }, "/auth/attest")
 ```
 
+Then, your server should be able to identify the user and return the IDs of the expected Credentials IDs to complete the Assertion ceremony.
+
 > [!IMPORTANT]
 >
 > It will depend on your server to find the ID of the keys for the user identifier received. For example, we can use the `email` to find the user and it's credentials, and then push a proper WebAuthn response with their information. Others may use the `username` or a given number.
 
-Usually, WebAuthn servers will return the user, a token, or even custom JSON with both after completing an assertion. You may use the `user` alias, or use `token` if the response is a single string for further authentication.
+Usually, the servers will complete the Assertion ceremony by retuning the user, a token, or even custom JSON with both. You may use the `user` alias, or use `token` if the response is a single string for further authentication.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -233,7 +235,7 @@ const attestOptionsConfig = {
     credentials: "include",
 }
 
-const assertConfig = {
+const attestConfig = {
     path: "/auth/attest",
     headers: {
         "X-Auth-Type": "WebAuthn"
@@ -244,7 +246,7 @@ const assertConfig = {
     }
 }
 
-const { data, success, error } = await Webpass.attest(attestOptionsConfig, assertConfig)
+const { data, success, error } = await Webpass.attest(attestOptionsConfig, attestConfig)
 ```
 
 ### Raw ceremonies
@@ -260,6 +262,8 @@ try {
     data = await Webpass.assertRaw("/auth/attest")
 } catch (e) {
     alert("Something didn't work. Check your device and try again!")
+
+    console.error(e)
 }
 ```
 
@@ -301,7 +305,7 @@ const assert = Webpass.assert(
 
 ## Serialization
 
-The credential is transmitted as JSON, but some parts of it are not JSON friendly. Until [WebAuthn Level 3 comes](https://w3c.github.io/webauthn/#sctn-parseCreationOptionsFromJSON), this library will automatically encode/decode binary data as BASE64 URL safe strings (also known as "websafe" BASE64) and viceversa.
+The credential is transmitted as JSON, but some parts of it are _not_ JSON friendly. Until [WebAuthn Level 3 comes](https://w3c.github.io/webauthn/#sctn-parseCreationOptionsFromJSON), this library will automatically encode/decode binary data as BASE64 URL safe strings (also known as "websafe" BASE64) and viceversa.
 
 This also allows the server to recover the data easily, independently of the language, from a BASE64 URL string.
 
@@ -382,7 +386,7 @@ Yes, import it as a script in your HTML `<header>` tag.
 ```html
 <head>
     <!-- ... -->
-    <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@1.*/dist/webpass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.js" defer></script>
 </head>
 ```
 
