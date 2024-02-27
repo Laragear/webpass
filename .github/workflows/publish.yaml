@@ -31,6 +31,14 @@ jobs:
           scope: '@laragear'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Cache NPM dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-npm-cache-
+
       - name: Install the dependencies
         run: npm ci
 
