@@ -9,7 +9,7 @@ import type {
     WebpassStatic
 } from "./types.ts"
 import {isNotSupported, isSupported, isUnsupported, isAutomatic, isNotAutomatic, isManual} from "./browser.ts"
-import {mergeDeep, isObjectEmpty, normalizeOptions, except} from "./utils.ts"
+import {mergeDeep, isObjectEmpty, normalizeOptions, except, isArrayBuffer} from "./utils.ts"
 import defaultConfig from "./config.ts"
 import wfetch from "./wfetch.ts"
 
@@ -45,7 +45,7 @@ function parseOutgoingCredentials(credentials: PublicKeyCredential | Credential)
 
     // Maintain future compatibility for WebAuthn 3.0 if some credential properties are already strings
     if ("rawId" in credentials) {
-        response.rawId = (credentials.rawId) instanceof ArrayBuffer
+        response.rawId = isArrayBuffer(credentials.rawId)
             ? arrayToBase64UrlString(credentials.rawId)
             : credentials.rawId
     }
@@ -54,7 +54,7 @@ function parseOutgoingCredentials(credentials: PublicKeyCredential | Credential)
         // Forcefully transform all ArrayBuffers in the credentials response as BASE64 strings.
         response.response = Object.fromEntries(
             Object.entries(credentials.response).map(([index, value]): [string, string] => {
-                return [index, value instanceof ArrayBuffer ? arrayToBase64UrlString(value) : value]
+                return [index, isArrayBuffer(value) ? arrayToBase64UrlString(value) : value]
             })
         )
     }

@@ -59,6 +59,16 @@ describe('Browser fast login tests', () => {
         expect(await isManual()).toBe(true)
     })
 
+    test('false when Supported and ConditionalMediation unavailable', async () => {
+        vi.stubGlobal('PublicKeyCredential', {
+            isUserVerifyingPlatformAuthenticatorAvailable: async () => true,
+        })
+
+        expect(await isAutomatic()).toBe(false)
+        expect(await isNotAutomatic()).toBe(true)
+        expect(await isManual()).toBe(true)
+    })
+
     test('false when partially Supported', async () => {
         vi.stubGlobal('PublicKeyCredential', {
             isUserVerifyingPlatformAuthenticatorAvailable: async () => false,
