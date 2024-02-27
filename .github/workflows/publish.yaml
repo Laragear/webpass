@@ -9,9 +9,7 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yaml
-
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    secrets: inherit
 
   release:
     runs-on: ubuntu-latest
