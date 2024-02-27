@@ -397,7 +397,7 @@ const { data, status, error, execute: login } = useLazyAsyncData('webauthn:asser
 
 ## CSRF / XSRF token
 
-To avoid  `TokenMismatchException` (`HTTP 419`) responses from the server, this library will automatically find your [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) before any ceremony by searching for it in your document `<meta>` tags, `<input>` tags, or cookies (in that order).
+To avoid  `TokenMismatchException` (`HTTP 419`) responses from the server, this library will automatically find your [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) before any ceremony by searching for it in your document `<meta>` tags, `<input>` tags, or cookies (in that order). If none is found, an error will be thrown.
 
 To disable this, set the `findCsrfToken` configuration to `false`.
 
@@ -407,17 +407,20 @@ import Webpass from "@laragear/webpass"
 const webpass = Webpass.create({
     findCsrfToken: false,
 })
+
+const { success } = await webpass.attest()
 ```
 
 Alternatively, you may want to set the token manually in the configuration headers to avoid searching for it, especially if your HTML page is very large in content.
 
 ```blade
 <script async>
-// Let Laravel Blade render the token in a Javascript block.
-const token = "{{ csrf_token() }}"
-
-// Call attestation with the token
-const { success } = await (Webpass.withCsrfToken(token)).attest()
+// Call attestation with the token rendered from Laravel Blade
+const { success } = await Webpass.attest({
+    headers: {
+        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+    }
+})
 </script>
 ```
 
