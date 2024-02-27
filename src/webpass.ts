@@ -233,7 +233,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
         assert,
         attest,
         assertRaw,
-        attestRaw
+        attestRaw,
     }
 }
 
