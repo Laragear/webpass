@@ -441,6 +441,10 @@ Yes, import it as a script in your HTML `<header>` tag.
 </head>
 ```
 
+* **Hey, this doesn't work!**
+
+Check your browser's Console for any errors. Most of the time, errors come up from the server or the authenticator.
+
 * **Can I serialize the Credentials in another format, like a giant BASE64 string?**
 
 No. This library works over JSON for communicating between the server and the browser. Binary strings (`ArrayBuffers`) are automatically transformed into BASE64 URL strings.
@@ -449,7 +453,11 @@ WebAunthn 3.0 _may_ include automatic serialization and deserialization.
 
 * **I get `TokenMismatch` HTTP 419 errors in my app. What I'm doing wrong?**
 
-[Use `withCsrfToken()`](#csrf--xsrf-token) with your CSRF or XSRF token before any ceremony.
+If you're using Laravel, check there is a [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) in your `<meta>` tags, `<input>` tags, or cookies.
+
+* **I get `The token must be an CSRF (40 characters) or XSRF token` in the console every time I try to use Webpass!**
+
+It's because Webpass its trying (and failing) to find a valid token. You may [issue your own](#csrf--xsrf-token), or [disable it all together](#csrf--xsrf-token).
 
 * **How do I decode the BASE64 URL strings incoming to the server?**
 
