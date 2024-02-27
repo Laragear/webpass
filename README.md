@@ -395,7 +395,7 @@ const { data, status, error, execute: login } = useLazyAsyncData('webauthn:asser
 </script>
 ```
 
-### CSRF / XSRF token
+## CSRF / XSRF token
 
 To avoid  `TokenMismatchException` (`HTTP 419`) responses from the server, this library will automatically find your [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) before any ceremony by searching for it in your document `<meta>` tags, `<input>` tags, or cookies (in that order).
 
