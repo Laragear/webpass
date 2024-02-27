@@ -7,17 +7,19 @@ export interface Endpoints extends Record<string, string> {
     assert: string,
 }
 
-export interface Config {
+export interface Config extends Partial<FetchOptions<"json">> {
+    routes: Endpoints,
+    findCsrfToken: boolean,
+    findXsrfToken: boolean,
     method: "get" | "post" | string,
     redirect: RequestRedirect,
     baseURL: string | undefined,
-    routes: Endpoints,
     headers: Record<string, string>,
     credentials: RequestCredentials,
 }
 
-export interface CeremonyOptions extends Partial<FetchOptions<"json">> {
-    path: string
+export interface CeremonyOptions extends Partial<Config> {
+    path: string,
 }
 
 export type CeremonyOptionsWithoutPath = Omit<CeremonyOptions, "path"> & { path?: string }
@@ -46,7 +48,7 @@ export interface Webpass {
     attest: Ceremony<AttestationResult>,
     assert:  Ceremony<AssertionResult>,
     attestRaw: Ceremony<CeremonyResultRaw>,
-    assertRaw: Ceremony<CeremonyResultRaw>
+    assertRaw: Ceremony<CeremonyResultRaw>,
 }
 
 export interface WebpassStatic extends Webpass {

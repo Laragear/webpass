@@ -1,6 +1,7 @@
-import {afterEach, assert, beforeEach, describe, expect, test, vi} from "vitest"
+import {afterEach, beforeEach, describe, expect, test, vi} from "vitest"
 import Webpass from "./webpass.ts"
 import wfetch from "./wfetch.ts";
+import {findTokenInCookie, findTokenInMeta, isCsrfToken} from "./csrf.ts";
 
 const attestOptions = {
     rp: {

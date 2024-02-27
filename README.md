@@ -70,7 +70,7 @@ If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you ma
 Alternatively, you may also use the `webpass.mjs` if you're using [ECMAScript modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) in your project.
 
 ```html
-<script type="module">
+<script type="module" async>
 import Webpass from "https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.mjs"
 
 Window.assert = async () => await Webpass.assert("/auth/assert-options", "/auth/assert")
@@ -220,7 +220,7 @@ Then, your server should be able to identify the user and return the IDs of the 
 
 > [!IMPORTANT]
 >
-> It will depend on your server to find the ID of the keys for the user identifier received. For example, we can use the `email` to find the user and it's credentials, and then push a proper WebAuthn response with their information. Others may use the `username` or a given number.
+> It will depend on your server to find the ID of the keys for the user identifier received. For example, we can use the `email` to find the user and its credentials, and then push a proper WebAuthn response with their information. Others may use the `username` or a given number.
 
 Usually, the servers will complete the Assertion ceremony by retuning the user, a token, or even custom JSON with both. You may use the `user` alias, or use `token` if the response is a single string for further authentication.
 
@@ -339,7 +339,7 @@ You can create a custom instance with a custom configuration to ease the usage o
 ```js
 import Webpass from "@laragear/webpass"
 
-const webauthn = Webpass.create({
+const webpass = Webpass.create({
     method: "post",
     redirect: "error",
     baseURL: undefined,
@@ -349,6 +349,7 @@ const webauthn = Webpass.create({
         assertOptions: "/auth/assert-options",
         assert: "/auth/assert",
     },
+    findCsrfToken: false,
     headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -358,7 +359,7 @@ const webauthn = Webpass.create({
 })
 
 // Create an attest in other part of the application, as the proper path and config are already loaded.
-const { credential, success, error } = await webauthn.attest()
+const { credential, success, error } = await webpass.attest()
 ```
 
 ## Using with Nuxt
@@ -394,6 +395,32 @@ const { data, status, error, execute: login } = useLazyAsyncData('webauthn:asser
 </script>
 ```
 
+### CSRF / XSRF token
+
+To avoid  `TokenMismatchException` (`HTTP 419`) responses from the server, this library will automatically find your [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) before any ceremony by searching for it in your document `<meta>` tags, `<input>` tags, or cookies (in that order).
+
+To disable this, set the `findCsrfToken` configuration to `false`.
+
+```js
+import Webpass from "@laragear/webpass"
+
+const webpass = Webpass.create({
+    findCsrfToken: false,
+})
+```
+
+Alternatively, you may want to set the token manually in the configuration headers to avoid searching for it, especially if your HTML page is very large in content.
+
+```blade
+<script async>
+// Let Laravel Blade render the token in a Javascript block.
+const token = "{{ csrf_token() }}"
+
+// Call attestation with the token
+const { success } = await (Webpass.withCsrfToken(token)).attest()
+</script>
+```
+
 ## FAQ
 
 * **Does this store user credentials?**
@@ -417,9 +444,13 @@ No. This library works over JSON for communicating between the server and the br
 
 WebAunthn 3.0 _may_ include automatic serialization and deserialization.
 
+* **I get `TokenMismatch` HTTP 419 errors in my app. What I'm doing wrong?**
+
+[Use `withCsrfToken()`](#csrf--xsrf-token) with your CSRF or XSRF token before any ceremony.
+
 * **How do I decode the BASE64 URL strings incoming to the server?**
 
-That depend on your server app and language which is written. Take this TypeScript example:
+That depends on your server app and language which is written. Take this TypeScript example:
 
 ```typescript
 import { Assert } from 'some-webauthn-library'
