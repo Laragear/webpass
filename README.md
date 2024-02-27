@@ -58,7 +58,25 @@ If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you ma
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.js" defer></script>
 
-<button type="button" onclick="Webpass.assert()">
+<script>
+    const assert = async () => await Webpass.assert("/auth/assert-options", "/auth/assert")
+</script>
+
+<button type="button" onclick="assert()">
+    Log in
+</button>
+```
+
+Alternatively, you may also use the `webpass.mjs` if you're using [ECMAScript modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) in your project.
+
+```html
+<script type="module">
+import Webpass from "https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.mjs"
+
+Window.assert = async () => await Webpass.assert("/auth/assert-options", "/auth/assert")
+</script>
+
+<button type="button" onclick="assert()">
     Log in
 </button>
 ```
@@ -81,7 +99,9 @@ if (Webpass.isUnsupported()) {
 
 > [!WARNING]
 >
-> If the device cannot verify the user itself, like on TouchID, FaceID, Windows Hello, fingerprint, PIN or else, you may **consider the context as insecure**, and you _shouldn't_ proceed. This kind of verification is the same as when the browser or OS confirms if a user wants to access its stored/shared passwords.
+> These functions check if WebAuthn is supported, and also if user verification (TouchID, FaceID, Windows Hello, fingerprint, PIN or else) is supported. If there is no user verification, WebAuthn is unsupported.
+>
+> In these cases, **consider the context as insecure**.
 
 After verifying the device, you're free to use Webpass.
 
@@ -91,14 +111,14 @@ The most straightforward way to use Webpass is to execute `Webpass.attest()` and
 import Webpass from "@laragear/webpass"
 
 // Create new credentials for a logged in user
-const { credential, success, error } = await Webpass.attest("/auth/webauthn/attest")
+const { credential, success, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
 
 // Check the credentials for a logged out user
-const { user, success, error } = await Webpass.assert("/auth/webauthn/assert")
+const { user, success, error } = await Webpass.assert("/auth/assert-options", "/auth/assert")
 
 // Or login with some data to fetch the correct credentials for the user:
 const { user, success, error } = await Webpass.assert({
-    path: "/auth/webauthn/assert",
+    path: "/auth/assert-options",
     body: {
         email: document.getElementById("email").value
     }
@@ -118,12 +138,12 @@ import Webpass from "@laragear/webpass"
 
 // Register credentials:
 const { credential, success, error } = await Webpass.attest(
-    "/auth/webauthn/attest-options", "/auth/webauthn/attest"
+    "/webauthn/attest/options", "/webauthn/attest"
 )
 
 // Login with credentials:
 const { user, success, error, pending } = await Webpass.assert(
-    "/auth/webauthn/assert-options", "/auth/webauthn/assert"
+    "/webauthn/attest/options", "/webauthn/assert"
 )
 ```
 
@@ -131,7 +151,7 @@ Of course, this may be too simple for your use case. Luckily, you can use a cust
 
 ### Attestation
 
-Attestation is the _ceremony_ to create credentials. In a nutshell, the browser retrieves _how_ to create a credential from the server, creates it, and the server receives the public key to store.
+Attestation is the _ceremony_ to create credentials. In a nutshell, the browser retrieves _how_ to create a credential from the server, creates it (as a private key), and the server receives the generated public key to store.
 
 Start an attestation using `attest()`, with the paths where the attestation options are retrieved, and the attestation response is sent back.
 
@@ -147,7 +167,7 @@ The attestation object contains:
 - `data`, the data received from the successful attestation
 - `error`, if the attestation was unsuccessful by an error
 
-While the `data` object will contain the response from the attestation server, most servers won't return body content on HTTP 201 or 206 codes. Others will return the ID of the credential created for redirection (like `/profile/devices/126`). For that matter, you can use the `credential` alias, or the `id` alias if you want to extract only the ID or UUID property.
+While the `data` object will contain the response from the attestation server, most servers won't return body content on `HTTP 201` or `HTTP 201` codes. Others will return the ID of the credential created for redirection (like `126` or a UUID). For that matter, you can use the `credential` alias, or the `id` alias if you want to extract only the ID or UUID property.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -181,7 +201,7 @@ The assertion object contains:
 
 The first request to the server is the most important. If your server instructed the authenticator to create [discoverable credentials](https://www.w3.org/TR/webauthn-2/#enum-residentKeyRequirement) (called "Resident Keys") in the device, you won't need anything more than the path to receive the assertion options as the device will automatically find the correct one.
 
-Otherwise, you may need to point out the user identifier, like its email, so the Authenticator can pick up the correct Non-Resident Keys. For that, you may [configure the ceremony](#ceremony-configuration) with a body your server can pick up.
+Otherwise, you may need to point out the user identifier, like its email. This way the server can find the Credentials IDs for the user, so the Authenticator can pick up the correct Non-Resident Key to authenticate. For that, you may [configure the ceremony](#ceremony-configuration) with a body your server can pick up.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -208,10 +228,10 @@ Usually, the servers will complete the Assertion ceremony by retuning the user, 
 import Webpass from "@laragear/webpass"
 import { useAuth } from '#/composables'
 
-const { token, success, error } = await Webpass.assert()
+const { user, success, error } = await Webpass.assert()
 
 if (success) {
-    return 'Redirecting to your dashboard...'
+    return `Welcome, ${user.name}!`
 }
 ```
 
@@ -277,7 +297,7 @@ const webpass = Webpass.create({
     baseURL: 'https://myapp.com/passkeys',
     retry: 3,
     retryDelay: 500,
-    onResponse: ({ response }) => console.debug(response)
+    onResponse: ({ response }) => console.debug(response),
 })
 
 const result = webpass.assert()
@@ -291,12 +311,14 @@ import Webpass from "@laragear/webpass"
 const assert = Webpass.assert(
     {
         // ...
+        path: "/auth/assert-options",
         retry: 5,
         retryDelay: 1000,
         onResponse: ({ response }) => console.debug(response)
     },
     {
         // ...
+        path: "/auth/assert",
         retry: 0,
         onResponse: ({ response }) => console.debug(response)
     })
@@ -397,17 +419,31 @@ WebAunthn 3.0 _may_ include automatic serialization and deserialization.
 
 * **How do I decode the BASE64 URL strings incoming to the server?**
 
-That depend on your server app and language which is written. Take this pseudocode for example:
+That depend on your server app and language which is written. Take this TypeScript example:
 
-```
-const array_buffers = [ "clientDataJSON", "attestationObject", "authenticatorData", "signature", "userHandle" ]
+```typescript
+import { Assert } from 'some-webauthn-library'
+import { Auth } from 'some-auth-library'
 
-function assert(Request: request) {
-    foreach (array_buffers as key) {
-        request->json()->response[key] = Base64Url::decode_binary(resolvedChallenge->response[key])
+/**
+ * Decode a BASE64 URL Safe string into an ArrayBuffer
+ */
+function decodeBase64(input: string): Uint8Array {
+    input = (input + "=".repeat((4 - input.length % 4) % 4))
+        .replace(/-/g, "+")
+        .replace(/_/g, "/")
+
+    return new TextEncoder().encode(input)
+}
+
+function assert(request: object): boolean {
+    for (key in Object.keys(request.response)) {
+        request.response[key] = decodeBase64(request.response[key])
     }
 
-    return WebAuthn::assert()->check(resolvedChallenge)
+    const { user, success } = Assert(request)
+
+    return success && Auth.login(user)
 }
 ```
 
