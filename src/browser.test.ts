@@ -1,4 +1,4 @@
-import {expect, test, vi, describe, beforeEach} from "vitest"
+import {beforeEach, describe, expect, test, vi} from "vitest"
 import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "./browser.ts";
 
 beforeEach(() => {
@@ -52,6 +52,16 @@ describe('Browser fast login tests', () => {
         vi.stubGlobal('PublicKeyCredential', {
             isUserVerifyingPlatformAuthenticatorAvailable: async () => true,
             isConditionalMediationAvailable: async () => false
+        })
+
+        expect(await isAutomatic()).toBe(false)
+        expect(await isNotAutomatic()).toBe(true)
+        expect(await isManual()).toBe(true)
+    })
+
+    test('false when Supported and ConditionalMediation unavailable', async () => {
+        vi.stubGlobal('PublicKeyCredential', {
+            isUserVerifyingPlatformAuthenticatorAvailable: async () => true,
         })
 
         expect(await isAutomatic()).toBe(false)

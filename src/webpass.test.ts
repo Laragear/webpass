@@ -115,6 +115,43 @@ describe("Webpass test", () => {
         expect(result).toEqual({id: 'test-id'})
     });
 
+    test('attests raw with data serialized', async () => {
+        // @ts-ignore
+        vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
+            return options.path === '/auth/attest-options' ? attestOptions : {id: 'test-id'}
+        })
+
+        vi.stubGlobal('navigator', {
+            credentials: {
+                create: () => {
+                    return {
+                        id: "JVR8r3vleicZCmDhNUkWW9F3pJMIXJESuo9nb_X-6rI",
+                        rawId: "JVR8r3vleicZCmDhNUkWW9F3pJMIXJESuo9nb_X-6rI",
+                        response: {
+                            attestationObject: "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikdKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFAAAAAQAAAAAAAAAAAAAAAAAAAAAAICVUfK975XonGQpg4TVJFlvRd6STCFyRErqPZ2_1_uqypQECAyYgASFYIIl2tHjMgLgCui-6vhsf7iQSpbTsLzkwCy547yOJPqDVIlggQMRGVVsLtGumRqGmWHhtziEvYLEexJ8GiAyRQ5OlmtM",
+                            clientDataJSON: "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWjluUVpiN1VaZHRHX2lBT1FHRFpWcVN0d0xjQ3RrYzR3a1ZBcXhSbVhpNnFXcXFHTlBGSHYzMVg0YWotVy1nTjJUMjFXY2s4aEMxOGZnTDlfM2E4cnciLCJvcmlnaW4iOiJodHRwczovL3dlYmF1dGhuLmlvIiwiY3Jvc3NPcmlnaW4iOmZhbHNlfQ",
+                            transports: ["usb"],
+                            publicKeyAlgorithm: -7,
+                            publicKey: "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEiXa0eMyAuAK6L7q-Gx_uJBKltOwvOTALLnjvI4k-oNVAxEZVWwu0a6ZGoaZYeG3OIS9gsR7EnwaIDJFDk6Wa0w",
+                            authenticatorData: "dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFAAAAAQAAAAAAAAAAAAAAAAAAAAAAICVUfK975XonGQpg4TVJFlvRd6STCFyRErqPZ2_1_uqypQECAyYgASFYIIl2tHjMgLgCui-6vhsf7iQSpbTsLzkwCy547yOJPqDVIlggQMRGVVsLtGumRqGmWHhtziEvYLEexJ8GiAyRQ5OlmtM",
+                        },
+                        type: "public-key",
+                        clientExtensionResults: {
+                            credProps: {
+                                rk: true
+                            }
+                        },
+                        authenticatorAttachment: "cross-platform"
+                    }
+                }
+            }
+        })
+
+        const result = await Webpass.attestRaw()
+
+        expect(result).toEqual({id: 'test-id'})
+    });
+
     test('attests raw throws if empty attestation options', async () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation(() => {
@@ -224,6 +261,37 @@ describe("Webpass test", () => {
         expect(result).toEqual({success: true})
     })
 
+    test('asserts raw with data serialized ', async () => {
+        // @ts-ignore
+        vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
+            return options.path === '/auth/assert-options' ? assertOptions : {success: true}
+        })
+
+        vi.stubGlobal('navigator', {
+            credentials: {
+                get: () => {
+                    return {
+                        id: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
+                        rawId: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
+                        response: {
+                            authenticatorData: "dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvAFAAAAAg",
+                            clientDataJSON: "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiMkNzTXZqZ2FuT1VuYk15dDNYSUhTMGstWDJIZGVDbU02dTYwd2VPeEphTE9CTm1uN0J3QTQ3TEFxWDZFVFdPMFh3LVZmWDcyWE9GWGN6a3ZUaXBYZWciLCJvcmlnaW4iOiJodHRwczovL3dlYmF1dGhuLmlvIiwiY3Jvc3NPcmlnaW4iOmZhbHNlLCJvdGhlcl9rZXlzX2Nhbl9iZV9hZGRlZF9oZXJlIjoiZG8gbm90IGNvbXBhcmUgY2xpZW50RGF0YUpTT04gYWdhaW5zdCBhIHRlbXBsYXRlLiBTZWUgaHR0cHM6Ly9nb28uZ2wveWFiUGV4In0",
+                            signature: "MEQCIDbDa-IDQlvcO81rBxXc3l_qcRzoe_IfDXV4h6eUDzBTAiB9I4C_mTJ6xiKW36MDbbkg6lT2iUVZCxGSHprNiGxYHg",
+                            userHandle: "YXNkYXNkQGFzZC5jb20",
+                        },
+                        type: "public-key",
+                        clientExtensionResults: {},
+                        authenticatorAttachment: "cross-platform"
+                    }
+                }
+            }
+        })
+
+        const result = await Webpass.assertRaw()
+
+        expect(result).toEqual({success: true})
+    })
+
     test('assert raw throws if empty assertion options', async () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation(() => {
@@ -285,7 +353,7 @@ describe("Webpass test", () => {
     test('asserts detects data key with token', async () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
-            return options.path === '/auth/assert-options' ? assertOptions : { token: 'test' }
+            return options.path === '/auth/assert-options' ? assertOptions : {token: 'test'}
         })
 
         vi.stubGlobal('navigator', {credentials: {get: () => assertResponse}})
@@ -293,8 +361,8 @@ describe("Webpass test", () => {
         const result = await Webpass.assert()
 
         expect(result).toEqual({
-            user: { token: 'test' },
-            data: { token: 'test' },
+            user: {token: 'test'},
+            data: {token: 'test'},
             error: undefined,
             token: 'test',
             success: true
@@ -323,7 +391,7 @@ describe("Webpass test", () => {
     test('asserts detects data key with jwt', async () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
-            return options.path === '/auth/assert-options' ? assertOptions : { jwt: 'test' }
+            return options.path === '/auth/assert-options' ? assertOptions : {jwt: 'test'}
         })
 
         vi.stubGlobal('navigator', {credentials: {get: () => assertResponse}})
@@ -331,8 +399,8 @@ describe("Webpass test", () => {
         const result = await Webpass.assert()
 
         expect(result).toEqual({
-            user: { jwt: 'test' },
-            data: { jwt: 'test' },
+            user: {jwt: 'test'},
+            data: {jwt: 'test'},
             error: undefined,
             token: 'test',
             success: true

@@ -1,4 +1,4 @@
-import {CeremonyOptionsWithoutPath, CeremonyOptions, Config } from "./types.ts"
+import {CeremonyOptions, CeremonyOptionsWithoutPath, Config} from "./types.ts"
 
 /**
  * Extracts a single key for the object.
@@ -26,6 +26,18 @@ export function except<T extends Record<string, any>, K extends Array<keyof T>>(
     }
 
     return result;
+}
+
+/**
+ * Check if a value is an Array Buffer, like an Uint8Array, or a plain array
+ */
+export function isArrayBuffer(value: any): boolean {
+    return typeof value === "object"
+        && (
+            value instanceof ArrayBuffer ||
+            value instanceof Uint8Array ||
+            (Array.isArray(value) && typeof value[0] === "number")
+        )
 }
 
 /**
