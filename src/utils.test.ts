@@ -1,4 +1,4 @@
-import {expect, test, vi, describe, beforeEach, assert} from "vitest"
+import {assert, describe, expect, test} from "vitest"
 import {except, isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions, pull} from "./utils.ts";
 import {CeremonyOptionsWithoutPath} from "./types.ts";
 import config from "./config.ts";

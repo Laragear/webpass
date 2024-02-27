@@ -1,15 +1,16 @@
 import type {
     AssertionResult,
     AttestationResult,
-    CeremonyOptionsWithoutPath, CeremonyResultRaw,
+    CeremonyOptionsWithoutPath,
+    CeremonyResultRaw,
     Config,
     ServerPublicKeyCredentialCreationOptions,
     ServerPublicKeyCredentialRequestOptions,
     Webpass,
     WebpassStatic
 } from "./types.ts"
-import {isNotSupported, isSupported, isUnsupported, isAutomatic, isNotAutomatic, isManual} from "./browser.ts"
-import {mergeDeep, isObjectEmpty, normalizeOptions, except, isArrayBuffer} from "./utils.ts"
+import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "./browser.ts"
+import {isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions} from "./utils.ts"
 import defaultConfig from "./config.ts"
 import wfetch from "./wfetch.ts"
 

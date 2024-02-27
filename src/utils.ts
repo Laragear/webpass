@@ -1,4 +1,4 @@
-import {CeremonyOptionsWithoutPath, CeremonyOptions, Config } from "./types.ts"
+import {CeremonyOptions, CeremonyOptionsWithoutPath, Config} from "./types.ts"
 
 /**
  * Extracts a single key for the object.

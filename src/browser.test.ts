@@ -1,4 +1,4 @@
-import {expect, test, vi, describe, beforeEach} from "vitest"
+import {beforeEach, describe, expect, test, vi} from "vitest"
 import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "./browser.ts";
 
 beforeEach(() => {
