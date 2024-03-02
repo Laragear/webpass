@@ -397,31 +397,32 @@ const { data, status, error, execute: login } = useLazyAsyncData('webauthn:asser
 
 ## CSRF / XSRF token
 
-To avoid  `TokenMismatchException` (`HTTP 419`) responses from the server, this library will automatically find your [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) before any ceremony by searching for it in your document `<meta>` tags, `<input>` tags, or cookies (in that order). If none is found, an error will be thrown.
+Theoretically, there is no need to use [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) for WebAuthn ceremonies. As credentials are mapped to a domain, trying to make a cross-request to an external domain will render them invalid.
 
-To disable this, set the `findCsrfToken` configuration to `false`.
+Regardless, you may receive `TokenMismatchException` (`HTTP 419`) responses from the server. To avoid this, Webpass can find a CSRF or XSRF token automatically by setting `findCsrfToken` to `true` in the configuration.
 
 ```js
 import Webpass from "@laragear/webpass"
 
 const webpass = Webpass.create({
-    findCsrfToken: false,
+    findCsrfToken: true,
 })
 
 const { success } = await webpass.attest()
 ```
 
-Alternatively, you may want to set the token manually in the configuration headers to avoid searching for it, especially if your HTML page is very large in content.
+This will allow Webpass to search in your document `<meta>` tags, `<input>` tags, or cookies (in that order) for a CSRF or XSRF token. If none is found, an error will be thrown.
 
-```blade
-<script async>
-// Call attestation with the token rendered from Laravel Blade
-const { success } = await Webpass.attest({
-    headers: {
-        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-    }
+Alternatively, you may set the token manually if you have direct access to it.
+
+```js
+import Webpass from "@laragear/webpass"
+
+const webpass = Webpass.create({
+    findCsrfToken: 'U9qhszdZCPQJTyhXTBD3qGB+SFQreARqSc8CNOML',
 })
-</script>
+
+const { success } = await webpass.attest()
 ```
 
 ## FAQ

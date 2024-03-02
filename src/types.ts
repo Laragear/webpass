@@ -9,8 +9,8 @@ export interface Endpoints extends Record<string, string> {
 
 export interface Config extends Partial<FetchOptions<"json">> {
     routes: Endpoints,
-    findCsrfToken: boolean,
-    findXsrfToken: boolean,
+    findCsrfToken: boolean|string,
+    findXsrfToken: boolean|string,
     method: "get" | "post" | string,
     redirect: RequestRedirect,
     baseURL: string | undefined,

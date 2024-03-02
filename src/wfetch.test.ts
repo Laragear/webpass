@@ -21,6 +21,14 @@ afterEach(() => {
 const token = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn'
 
 describe('Fetch test', () => {
+    test('fetch without token by default', async() => {
+        expect(await wfetch({
+            path: 'foo-bar',
+        }, {
+            foo: {quz: 'qux'}
+        })).toHaveProperty('options.body', {foo: {quz: 'qux'}})
+    })
+
     test('fetch with token found in header', async () => {
         expect(await wfetch({
             path: 'foo-bar',

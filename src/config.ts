@@ -9,8 +9,8 @@ export default {
     method: "post",
     redirect: "error",
     baseURL: undefined,
-    findCsrfToken: true,
-    findXsrfToken: true,
+    findCsrfToken: false,
+    findXsrfToken: false,
     routes: {
         attestOptions: "/auth/attest-options",
         attest: "/auth/attest",
