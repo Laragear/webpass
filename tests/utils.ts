@@ -1,7 +1,7 @@
 import {assert, describe, expect, test} from "vitest"
-import {except, isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions, pull} from "./utils.ts";
-import {CeremonyOptionsWithoutPath} from "./types.ts";
-import config from "./config.ts";
+import {except, isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions, pull} from "../src/utils"
+import {CeremonyOptionsWithoutPath} from "../src/types"
+import config from "../src/config"
 
 describe('Pull test', () => {
     test('extracts one key from object', () => {

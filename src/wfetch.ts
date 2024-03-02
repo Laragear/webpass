@@ -1,7 +1,7 @@
-import {CeremonyOptions, CeremonyOptionsWithoutPath, type Webpass} from "./types.ts"
+import type {CeremonyOptions, CeremonyOptionsWithoutPath } from "./types"
 import {ofetch} from "ofetch"
-import {mergeDeep, pull} from "./utils.ts"
-import {findTokenInCookie, findTokenInInput, findTokenInMeta, isCsrfToken} from "./csrf.ts";
+import {mergeDeep, pull} from "./utils"
+import {findTokenInCookie, findTokenInInput, findTokenInMeta, isCsrfToken} from "./csrf";
 
 /**
  * Check if the headers don't have a CSRF or XSRF token.

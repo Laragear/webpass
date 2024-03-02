@@ -4,6 +4,7 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'happy-dom',
+        include: ["tests/**/*.ts"],
         coverage: {
             exclude: [
                 ...configDefaults.coverage.exclude ?? [],

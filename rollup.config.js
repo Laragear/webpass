@@ -8,7 +8,7 @@ export default {
     output: [
         {
             file: "dist/webpass.mjs",
-            format: "esm"
+            format: "esm",
         },
         {
             name: "Webpass",
@@ -17,7 +17,9 @@ export default {
         }
     ],
     plugins: [
-        typescript(),
+        typescript({
+            exclude: "tests/**/*",
+        }),
         commonjs(),
         nodeResolve(),
         terser()
