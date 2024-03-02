@@ -15,13 +15,25 @@ function missingToken(headers: Record<string, string>): boolean {
 }
 
 /**
- * Check if the token should be found.
+ * Pull the token configuration key out of the options
  */
-function shouldFindToken(options: CeremonyOptionsWithoutPath): boolean {
-    const findCsrf = pull(options, "findCsrfToken")
-    const findXsrf = pull(options, "findXsrfToken")
+function pullTokenConfig(options: CeremonyOptionsWithoutPath): boolean|string {
+    return pull(options, "findCsrfToken") || pull(options, "findXsrfToken") as boolean|string
+}
 
-    return Boolean(findCsrf || findXsrf)
+/**
+ * Set the token in the headers if needed.
+ */
+function setToken(token: string|boolean, headers: Record<string, string>): void {
+    // Find the token if the token is set to "true"
+    if (token === true && missingToken(headers)) {
+        token = findTokenInMeta() ?? findTokenInInput() ?? findTokenInCookie() ?? ''
+    }
+
+    // If the token is a string, add it verbatim to the header.
+    if (typeof token === "string") {
+        headers[isCsrfToken(token) ? 'X-CSRF-TOKEN' : 'X-XSRF-TOKEN'] = token
+    }
 }
 
 export default async <T>(options: CeremonyOptions, webAuthnData: Object = {}): Promise<T> => {
@@ -29,12 +41,7 @@ export default async <T>(options: CeremonyOptions, webAuthnData: Object = {}): P
 
     fetchOptions.headers = fetchOptions.headers || {}
 
-    if (shouldFindToken(fetchOptions) && missingToken(fetchOptions.headers)) {
-        // Find the token in the document meta tags, inputs or cookies.
-        const token = findTokenInMeta() ?? findTokenInInput() ?? findTokenInCookie() ?? ''
-
-        fetchOptions.headers[isCsrfToken(token) ? 'X-CSRF-TOKEN' : 'X-XSRF-TOKEN'] = token
-    }
+    setToken(pullTokenConfig(options), fetchOptions.headers)
 
     // @ts-ignore
     fetchOptions.body = mergeDeep(fetchOptions.body ?? {}, webAuthnData)
