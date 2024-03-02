@@ -8,11 +8,11 @@ import type {
     ServerPublicKeyCredentialRequestOptions,
     Webpass,
     WebpassStatic
-} from "./types.ts"
-import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "./browser.ts"
-import {isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions} from "./utils.ts"
-import defaultConfig from "./config.ts"
-import wfetch from "./wfetch.ts"
+} from "./types"
+import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "./browser"
+import {isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions} from "./utils"
+import defaultConfig from "./config"
+import wfetch from "./wfetch"
 
 /**
  * Parse the incoming credential creation options from the server, which is partially BASE64 URL encoded.

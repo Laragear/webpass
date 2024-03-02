@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, test, vi} from "vitest"
-import wfetch from "./wfetch.ts";
+import wfetch from "../src/wfetch"
 
 vi.mock('ofetch', () => {
     return {

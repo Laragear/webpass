@@ -1,5 +1,5 @@
-import {afterEach, beforeEach, describe, expect, test, vi} from "vitest";
-import {findTokenInCookie, findTokenInInput, findTokenInMeta, isCsrfToken} from "./csrf.ts";
+import {afterEach, beforeEach, describe, expect, test, vi} from "vitest"
+import {findTokenInCookie, findTokenInInput, findTokenInMeta, isCsrfToken} from "../src/csrf"
 
 beforeEach(() => {
     vi.resetModules()

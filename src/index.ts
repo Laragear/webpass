@@ -1,3 +1,3 @@
-import Webpass from "./webpass.ts"
+import Webpass from "./webpass"
 
 export default Webpass;

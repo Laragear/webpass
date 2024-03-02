@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, test, vi} from "vitest"
-import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "./browser.ts";
+import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "../src/browser"
 
 beforeEach(() => {
     vi.restoreAllMocks();

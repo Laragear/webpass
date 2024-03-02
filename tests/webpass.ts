@@ -1,7 +1,6 @@
 import {afterEach, beforeEach, describe, expect, test, vi} from "vitest"
-import Webpass from "./webpass.ts"
-import wfetch from "./wfetch.ts";
-import {findTokenInCookie, findTokenInMeta, isCsrfToken} from "./csrf.ts";
+import Webpass from "../src/webpass"
+import wfetch from "../src/wfetch"
 
 const attestOptions = {
     rp: {
@@ -91,7 +90,7 @@ afterEach(() => {
     vi.clearAllMocks()
 })
 
-vi.mock('./wfetch.ts')
+vi.mock('../src/wfetch')
 
 describe("Webpass test", () => {
     test('creates instance', () => {
