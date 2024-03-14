@@ -18,7 +18,13 @@ const attestOptions = {
         {type: "public-key", alg: -257}
     ],
     timeout: 60000,
-    excludeCredentials: [],
+    excludeCredentials: [
+        {
+            id: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
+            type: "public-key",
+            transports: ["usb"]
+        }
+    ],
     authenticatorSelection: {
         residentKey: "preferred",
         requireResidentKey: false,
@@ -59,9 +65,7 @@ const assertOptions = {
         {
             id: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
             type: "public-key",
-            transports: [
-                "usb"
-            ]
+            transports: ["usb"]
         }
     ],
     userVerification: "preferred"
