@@ -6,4 +6,3 @@ node_modules
 coverage
 types
 .conf*
-package-lock.json
