@@ -13,6 +13,7 @@ import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUn
 import {isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions} from "./utils"
 import defaultConfig from "./config"
 import wfetch from "./wfetch"
+import benchmark from "./benchmark"
 
 /**
  * Parse the incoming credential creation options from the server, which is partially BASE64 URL encoded.
@@ -102,6 +103,7 @@ function newError(name: string, message: string): Error {
     return error
 }
 
+
 /**
  * Create a new Webpass instance.
  */
@@ -143,12 +145,16 @@ function webpass(config: Partial<Config> = {}): Webpass {
      * Registers the device public key in the server.
      */
     async function attestRaw(options?: CeremonyOptionsWithoutPath | string, response?: CeremonyOptionsWithoutPath | string): Promise<CeremonyResultRaw> {
+        const bench = benchmark()
+
         // Normalize the arguments
         const normalizedOptions = normalizeOptions(options, currentConfig, "attestOptions")
         const normalizedResponseOptions = normalizeOptions(response, currentConfig, "attest")
 
         // Retrieve the attestation options from the server
         const attestationOptions: ServerPublicKeyCredentialCreationOptions | undefined = await wfetch<ServerPublicKeyCredentialCreationOptions | undefined>(normalizedOptions)
+
+        console.debug('Attestation Options Received', attestationOptions)
 
         // If the response is empty, bail out
         if (!attestationOptions || isObjectEmpty(attestationOptions)) {
@@ -159,12 +165,20 @@ function webpass(config: Partial<Config> = {}): Webpass {
             publicKey: parseServerCreationOptions(attestationOptions)
         })
 
+        console.debug('Attestation Credentials Created', credentials);
+
         // If the user denied the permission, throw an error.
         if (!credentials || isObjectEmpty(credentials)) {
             throw newError("AttestationCancelled", "The credentials creation was cancelled by the user or a timeout.")
         }
 
-        return await wfetch<Record<string, any>>(normalizedResponseOptions, parseOutgoingCredentials(credentials))
+        const result = await wfetch<Record<string, any>>(
+            normalizedResponseOptions, parseOutgoingCredentials(credentials)
+        )
+
+        console.debug('Attestation benchmark', bench.stop())
+
+        return result
     }
 
     /**
@@ -209,12 +223,16 @@ function webpass(config: Partial<Config> = {}): Webpass {
      * Assert a WebAuthn challenge, returns the user and token or null.
      */
     async function assertRaw(options?: CeremonyOptionsWithoutPath | string, response?: CeremonyOptionsWithoutPath | string): Promise<CeremonyResultRaw> {
+        const bench = benchmark()
+
         // Normalize the arguments
         const normalizedOptions = normalizeOptions(options, currentConfig, "assertOptions")
         const normalizedResponseOptions = normalizeOptions(response, currentConfig, "assert")
 
         // Get the assertion challenge from the server
         const assertionOptions: ServerPublicKeyCredentialRequestOptions | undefined = await wfetch<ServerPublicKeyCredentialRequestOptions | undefined>(normalizedOptions)
+
+        console.debug('Assertion Options Received', assertionOptions)
 
         // If we didn't receive anything, return it as an invalid server message.
         if (!assertionOptions || isObjectEmpty(assertionOptions)) {
@@ -226,13 +244,21 @@ function webpass(config: Partial<Config> = {}): Webpass {
             publicKey: parseServerRequestOptions(assertionOptions)
         })
 
+        console.debug('Assertion Credentials Retrieved', assertionOptions)
+
         // If the user denied the permission, return null
         if (!credentials) {
             throw newError("AssertionCancelled", "The credentials request was cancelled by the user or timeout.")
         }
 
         // Expect an authentication response from the server with the user, credentials, or anything.
-        return await wfetch<Record<string, string>>(normalizedResponseOptions, parseOutgoingCredentials(credentials))
+        const result =  await wfetch<Record<string, string>>(
+            normalizedResponseOptions, parseOutgoingCredentials(credentials)
+        )
+
+        console.debug('Assertion benchmark', bench.stop())
+
+        return result
     }
 
     return {
