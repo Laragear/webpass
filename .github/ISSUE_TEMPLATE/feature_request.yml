@@ -45,7 +45,7 @@ body:
       label: Code sample
       description: Sample a small snippet on how the feature works
       placeholder: |
-        Laragear::newFeature()->cool();
+        laragear.newFeature().cool()
       render: php
     validations:
       required: true
