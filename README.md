@@ -425,7 +425,7 @@ const webpass = Webpass.create({
 const { success } = await webpass.attest()
 ```
 
-### Debugging
+## Debugging
 
 During development, you may want to check if your application attests and asserts correctly with different authenticators. This package automatically calls `console.debug()` for both ceremonies, so you can find in your browser console the data being moved between the authenticator and your application.
 
