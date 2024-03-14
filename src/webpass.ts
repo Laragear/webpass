@@ -13,6 +13,7 @@ import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUn
 import {isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions} from "./utils"
 import defaultConfig from "./config"
 import wfetch from "./wfetch"
+import benchmark from "./benchmark"
 
 /**
  * Parse the incoming credential creation options from the server, which is partially BASE64 URL encoded.
@@ -96,6 +97,7 @@ function newError(name: string, message: string): Error {
     return error
 }
 
+
 /**
  * Create a new Webpass instance.
  */
@@ -137,6 +139,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
      * Registers the device public key in the server.
      */
     async function attestRaw(options?: CeremonyOptionsWithoutPath | string, response?: CeremonyOptionsWithoutPath | string): Promise<CeremonyResultRaw> {
+        const bench = benchmark()
+
         // Normalize the arguments
         const normalizedOptions = normalizeOptions(options, currentConfig, "attestOptions")
         const normalizedResponseOptions = normalizeOptions(response, currentConfig, "attest")
@@ -162,7 +166,13 @@ function webpass(config: Partial<Config> = {}): Webpass {
             throw newError("AttestationCancelled", "The credentials creation was cancelled by the user or a timeout.")
         }
 
-        return await wfetch<Record<string, any>>(normalizedResponseOptions, parseOutgoingCredentials(credentials))
+        const result = await wfetch<Record<string, any>>(
+            normalizedResponseOptions, parseOutgoingCredentials(credentials)
+        )
+
+        console.debug('Attestation benchmark', bench.stop())
+
+        return result
     }
 
     /**
@@ -207,6 +217,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
      * Assert a WebAuthn challenge, returns the user and token or null.
      */
     async function assertRaw(options?: CeremonyOptionsWithoutPath | string, response?: CeremonyOptionsWithoutPath | string): Promise<CeremonyResultRaw> {
+        const bench = benchmark()
+
         // Normalize the arguments
         const normalizedOptions = normalizeOptions(options, currentConfig, "assertOptions")
         const normalizedResponseOptions = normalizeOptions(response, currentConfig, "assert")
@@ -234,7 +246,13 @@ function webpass(config: Partial<Config> = {}): Webpass {
         }
 
         // Expect an authentication response from the server with the user, credentials, or anything.
-        return await wfetch<Record<string, string>>(normalizedResponseOptions, parseOutgoingCredentials(credentials))
+        const result =  await wfetch<Record<string, string>>(
+            normalizedResponseOptions, parseOutgoingCredentials(credentials)
+        )
+
+        console.debug('Assertion benchmark', bench.stop())
+
+        return result
     }
 
     return {

@@ -425,6 +425,30 @@ const webpass = Webpass.create({
 const { success } = await webpass.attest()
 ```
 
+### Debugging
+
+During development, you may want to check if your application attests and asserts correctly with different authenticators. This package automatically calls `console.debug()` for both ceremonies, so you can find in your browser console the data being moved between the authenticator and your application.
+
+Enabling debug messages in your console would yield entries like this:
+
+    [Assertion Credentials Retrieved]
+      {
+        challenge: '2CsMvjganOUnbMyt3XIHS0k-X2HdeCmM6u60weOxJaLOBNmn7BwA47LAqX6ETWO0Xw-VfX72XOFXczkvTipXeg',
+        timeout: 60000,
+        rpId: 'webauthn.com',
+        allowCredentials: [
+          {
+            id: 'OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU',
+            type: 'public-key',
+            transports: ['usb']
+          }
+        ],
+        userVerification: 'preferred'
+      }
+
+    [Assertion benchmark]
+      1 minute, 23 seconds.
+
 ## FAQ
 
 * **Does this store user credentials?**
@@ -459,6 +483,10 @@ If you're using Laravel, check there is a [CSRF or XSRF token](https://laravel.c
 * **I get `The token must be an CSRF (40 characters) or XSRF token` in the console every time I try to use Webpass!**
 
 It's because Webpass its trying (and failing) to find a valid token. You may [issue your own](#csrf--xsrf-token), or [disable it all together](#csrf--xsrf-token).
+
+* **How do I enable debug messages?**
+
+By default, browsers don't show debug messages in the Console. To enable that, enable/raise messages levels to "debug". Usually that option is shown as "Levels" or "Filters" on the top of the console pane.
 
 * **How do I decode the BASE64 URL strings incoming to the server?**
 
