@@ -144,6 +144,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
         // Retrieve the attestation options from the server
         const attestationOptions: ServerPublicKeyCredentialCreationOptions | undefined = await wfetch<ServerPublicKeyCredentialCreationOptions | undefined>(normalizedOptions)
 
+        console.debug('Attestation Options Received', attestationOptions)
+
         // If the response is empty, bail out
         if (!attestationOptions || isObjectEmpty(attestationOptions)) {
             throw newError("InvalidAttestationResponse", "The server responded with invalid or empty credential creation options.")
@@ -152,6 +154,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
         const credentials: Credential | null = await navigator.credentials.create({
             publicKey: parseServerCreationOptions(attestationOptions)
         })
+
+        console.debug('Attestation Credentials Created', credentials);
 
         // If the user denied the permission, throw an error.
         if (!credentials || isObjectEmpty(credentials)) {
@@ -210,6 +214,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
         // Get the assertion challenge from the server
         const assertionOptions: ServerPublicKeyCredentialRequestOptions | undefined = await wfetch<ServerPublicKeyCredentialRequestOptions | undefined>(normalizedOptions)
 
+        console.debug('Assertion Options Received', assertionOptions)
+
         // If we didn't receive anything, return it as an invalid server message.
         if (!assertionOptions || isObjectEmpty(assertionOptions)) {
             throw newError("InvalidAssertionResponse", "The server responded with invalid or empty credential request options.")
@@ -219,6 +225,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
         const credentials: Credential | null = await navigator.credentials.get({
             publicKey: parseServerRequestOptions(assertionOptions)
         })
+
+        console.debug('Assertion Credentials Retrieved', assertionOptions)
 
         // If the user denied the permission, return null
         if (!credentials) {
