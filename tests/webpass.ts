@@ -1,4 +1,4 @@
-import {afterEach, beforeEach, describe, expect, test, vi} from "vitest"
+import {afterAll, afterEach, beforeEach, describe, expect, test, vi} from "vitest"
 import Webpass from "../src/webpass"
 import wfetch from "../src/wfetch"
 
@@ -97,6 +97,13 @@ afterEach(() => {
 vi.mock('../src/wfetch')
 
 describe("Webpass test", () => {
+
+    const consoleMock = vi.spyOn(console, 'debug').mockImplementation(() => undefined);
+
+    afterAll(() => {
+        consoleMock.mockReset()
+    })
+
     test('creates instance', () => {
         const webpass = Webpass.create()
 
