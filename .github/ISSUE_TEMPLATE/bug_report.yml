@@ -15,37 +15,29 @@ body:
 
         The more detailed this bug report is, the faster it can be reviewed and fixed.
   - type: input
-    id: version-php-os
+    id: version-bundler-platform
     attributes:
-      label: PHP & Platform
-      description: Exact PHP and Platform (OS) versions using this package.
-      placeholder: 8.1.2 - Ubuntu 22.04 x64
-    validations:
-      required: true
-  - type: input
-    id: version-db
-    attributes:
-      label: Database
-      description: Exact DB version using this package, if applicable.
-      placeholder: MySQL 8.0.28
+      label: Bundler & Interpreter
+      description: Exact Bundler name and Interpreter versions, if applicable.
+      placeholder: Vite 5.1.6 - Node.js 20.11.1
     validations:
       required: false
   - type: input
-    id: version-laravel
+    id: version-browser-os
     attributes:
-      label: Laravel version
-      description: Exact Laravel version using this package.
-      placeholder: 9.2.3
+      label: Browser & OS
+      description: Exact Browser version and OS (platform) running this package.
+      placeholder: Safari 12 (14606.1.36) - macOS 14.1
     validations:
-      required: true
+      required: false
   - type: checkboxes
     id: requirements
     attributes:
       label: Have you done this?
       options:
-        - label: I have checked my logs and I'm sure is a bug in this package.
+        - label: I have checked my logs and I am sure is a bug in this package.
           required: true
-        - label: I can reproduce this bug in isolation (vanilla Laravel install)
+        - label: I can reproduce this bug in isolation (vanilla install)
           required: true
         - label: I can suggest a workaround as a Pull Request
           required: false
@@ -69,12 +61,14 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      description: Paste the code to assert in a test, or just comment with the repository with the bug to download.
-      render: php
+      description: Paste the code to assert in Vitest, or just comment with the repository with the bug to reproduce.
+      render: javascript
       placeholder: |
-        $test = Laragear::make()->break();
+        import laragear from 'laragear'
+        
+        const test = laragear.make().break()
 
-        static::assertFalse($test);
+        expect(test).toBe(false);
 
         // or comment with "https://github.com/my-name/my-bug-report"
     validations:
@@ -83,7 +77,7 @@ body:
     id: logs
     attributes:
       label: Stack trace & logs
-      description: If you have a **full** stack trace, you can copy it here. You may hide sensible information.
+      description: If you have a **full** console stack trace, you can copy it here. You may hide sensible information.
       placeholder: This is automatically formatted into code, no need for ``` backticks.
       render: shell
     validations:
