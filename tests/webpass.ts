@@ -18,7 +18,13 @@ const attestOptions = {
         {type: "public-key", alg: -257}
     ],
     timeout: 60000,
-    excludeCredentials: [],
+    excludeCredentials: [
+        {
+            id: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
+            type: "public-key",
+            transports: ["usb"]
+        }
+    ],
     authenticatorSelection: {
         residentKey: "preferred",
         requireResidentKey: false,
@@ -59,9 +65,7 @@ const assertOptions = {
         {
             id: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
             type: "public-key",
-            transports: [
-                "usb"
-            ]
+            transports: ["usb"]
         }
     ],
     userVerification: "preferred"
@@ -210,6 +214,30 @@ describe("Webpass test", () => {
         })
     })
 
+    test('attest without excludedCredentials key', async () => {
+        // @ts-ignore
+        vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
+            if (options.path === '/auth/attest-options') {
+                const { excludeCredentials: _, ...withoutExcludedCredentials } = attestOptions
+
+                return withoutExcludedCredentials
+            }
+            return {uuid: 'test-uuid'}
+        })
+
+        vi.stubGlobal('navigator', {credentials: {create: () => attestResponse}})
+
+        const result = await Webpass.attest()
+
+        expect(result).toEqual({
+            credentials: {uuid: 'test-uuid'},
+            data: {uuid: 'test-uuid'},
+            error: undefined,
+            id: 'test-uuid',
+            success: true
+        })
+    })
+
     test('attest error if empty attestation options', async () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation(() => {
@@ -265,6 +293,43 @@ describe("Webpass test", () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
             return options.path === '/auth/assert-options' ? assertOptions : {success: true}
+        })
+
+        vi.stubGlobal('navigator', {
+            credentials: {
+                get: () => {
+                    return {
+                        id: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
+                        rawId: "OMR2xF8KLNYj40-5k_O-_m6vSur2FGJL1gkg_315NGU",
+                        response: {
+                            authenticatorData: "dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvAFAAAAAg",
+                            clientDataJSON: "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiMkNzTXZqZ2FuT1VuYk15dDNYSUhTMGstWDJIZGVDbU02dTYwd2VPeEphTE9CTm1uN0J3QTQ3TEFxWDZFVFdPMFh3LVZmWDcyWE9GWGN6a3ZUaXBYZWciLCJvcmlnaW4iOiJodHRwczovL3dlYmF1dGhuLmlvIiwiY3Jvc3NPcmlnaW4iOmZhbHNlLCJvdGhlcl9rZXlzX2Nhbl9iZV9hZGRlZF9oZXJlIjoiZG8gbm90IGNvbXBhcmUgY2xpZW50RGF0YUpTT04gYWdhaW5zdCBhIHRlbXBsYXRlLiBTZWUgaHR0cHM6Ly9nb28uZ2wveWFiUGV4In0",
+                            signature: "MEQCIDbDa-IDQlvcO81rBxXc3l_qcRzoe_IfDXV4h6eUDzBTAiB9I4C_mTJ6xiKW36MDbbkg6lT2iUVZCxGSHprNiGxYHg",
+                            userHandle: "YXNkYXNkQGFzZC5jb20",
+                        },
+                        type: "public-key",
+                        clientExtensionResults: {},
+                        authenticatorAttachment: "cross-platform"
+                    }
+                }
+            }
+        })
+
+        const result = await Webpass.assertRaw()
+
+        expect(result).toEqual({success: true})
+    })
+
+    test('assert without existing credentials', async () => {
+        // @ts-ignore
+        vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
+            if (options.path === '/auth/assert-options') {
+                const { allowCredentials: _, ...withoutCredentials } = assertOptions
+
+                return withoutCredentials
+            }
+
+            return {success: true}
         })
 
         vi.stubGlobal('navigator', {
