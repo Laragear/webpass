@@ -22,7 +22,10 @@ function parseServerCreationOptions(publicKey: ServerPublicKeyCredentialCreation
         ...publicKey,
         challenge: base64UrlToUint8Array(publicKey.challenge),
         user: {...publicKey.user, id: base64UrlToUint8Array(publicKey.user.id)},
-        excludeCredentials: publicKey.excludeCredentials.map(data => ({...data, id: base64UrlToUint8Array(data.id)}))
+        excludeCredentials: (publicKey.excludeCredentials ?? []).map(data => ({
+            ...data,
+            id: base64UrlToUint8Array(data.id)
+        }))
     }
 }
 
@@ -33,7 +36,10 @@ function parseServerRequestOptions(publicKey: ServerPublicKeyCredentialRequestOp
     return {
         ...publicKey,
         challenge: base64UrlToUint8Array(publicKey.challenge),
-        allowCredentials: publicKey.allowCredentials.map(data => ({...data, id: base64UrlToUint8Array(data.id)}))
+        allowCredentials: (publicKey.allowCredentials ?? []).map(data => ({
+            ...data,
+            id: base64UrlToUint8Array(data.id)
+        }))
     }
 }
 
