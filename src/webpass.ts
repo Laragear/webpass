@@ -154,7 +154,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
         // Retrieve the attestation options from the server
         const attestationOptions: ServerPublicKeyCredentialCreationOptions | undefined = await wfetch<ServerPublicKeyCredentialCreationOptions | undefined>(normalizedOptions)
 
-        console.debug('Attestation Options Received', attestationOptions)
+        console.debug("Attestation Options Received", attestationOptions)
 
         // If the response is empty, bail out
         if (!attestationOptions || isObjectEmpty(attestationOptions)) {
@@ -165,10 +165,10 @@ function webpass(config: Partial<Config> = {}): Webpass {
             publicKey: parseServerCreationOptions(attestationOptions)
         })
 
-        console.debug('Attestation Credentials Created', credentials);
+        console.debug("Attestation Credentials Created", credentials);
 
         // If the user denied the permission, throw an error.
-        if (!credentials || isObjectEmpty(credentials)) {
+        if (!credentials) {
             throw newError("AttestationCancelled", "The credentials creation was cancelled by the user or a timeout.")
         }
 
@@ -176,7 +176,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
             normalizedResponseOptions, parseOutgoingCredentials(credentials)
         )
 
-        console.debug('Attestation benchmark', bench.stop())
+        console.debug("Attestation benchmark", bench.stop())
 
         return result
     }
@@ -232,7 +232,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
         // Get the assertion challenge from the server
         const assertionOptions: ServerPublicKeyCredentialRequestOptions | undefined = await wfetch<ServerPublicKeyCredentialRequestOptions | undefined>(normalizedOptions)
 
-        console.debug('Assertion Options Received', assertionOptions)
+        console.debug("Assertion Options Received", assertionOptions)
 
         // If we didn't receive anything, return it as an invalid server message.
         if (!assertionOptions || isObjectEmpty(assertionOptions)) {
@@ -244,7 +244,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
             publicKey: parseServerRequestOptions(assertionOptions)
         })
 
-        console.debug('Assertion Credentials Retrieved', assertionOptions)
+        console.debug("Assertion Credentials Retrieved", assertionOptions)
 
         // If the user denied the permission, return null
         if (!credentials) {
@@ -256,7 +256,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
             normalizedResponseOptions, parseOutgoingCredentials(credentials)
         )
 
-        console.debug('Assertion benchmark', bench.stop())
+        console.debug("Assertion benchmark", bench.stop())
 
         return result
     }
