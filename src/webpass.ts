@@ -9,96 +9,30 @@ import type {
     Webpass,
     WebpassStatic
 } from "./types"
-import {isAutomatic, isManual, isNotAutomatic, isNotSupported, isSupported, isUnsupported} from "./browser"
-import {isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions} from "./utils"
+import {
+    isSupported,
+    isNotSupported,
+    isUnsupported,
+    isAutofillable,
+    isNotAutofillable,
+    isPlatformAuthenticator,
+    isNotPlatformAuthenticator
+} from "./browser"
+import {isObjectEmpty, mergeDeep, normalizeOptions} from "./utils"
 import defaultConfig from "./config"
 import wfetch from "./wfetch"
 import benchmark from "./benchmark"
-
-/**
- * Parse the incoming credential creation options from the server, which is partially BASE64 URL encoded.
- */
-function parseServerCreationOptions(publicKey: ServerPublicKeyCredentialCreationOptions): PublicKeyCredentialCreationOptions {
-    return {
-        ...publicKey,
-        challenge: base64UrlToUint8Array(publicKey.challenge),
-        user: {...publicKey.user, id: base64UrlToUint8Array(publicKey.user.id)},
-        excludeCredentials: (publicKey.excludeCredentials ?? []).map(data => ({
-            ...data,
-            id: base64UrlToUint8Array(data.id)
-        }))
-    }
-}
-
-/**
- * Parse the incoming credential request options from the server, which is partially BASE64 URL encoded.
- */
-function parseServerRequestOptions(publicKey: ServerPublicKeyCredentialRequestOptions): PublicKeyCredentialRequestOptions {
-    return {
-        ...publicKey,
-        challenge: base64UrlToUint8Array(publicKey.challenge),
-        allowCredentials: (publicKey.allowCredentials ?? []).map(data => ({
-            ...data,
-            id: base64UrlToUint8Array(data.id)
-        }))
-    }
-}
-
-/**
- * Parses the outgoing credentials from the browser to the server.
- */
-function parseOutgoingCredentials(credentials: PublicKeyCredential | Credential): Record<string, any> {
-    // Copy all the credentials properties into a new object.
-    const response: Record<string, any> = Object.assign({}, credentials)
-
-    // Maintain future compatibility for WebAuthn 3.0 if some credential properties are already strings
-    if ("rawId" in credentials) {
-        response.rawId = isArrayBuffer(credentials.rawId)
-            ? arrayToBase64UrlString(credentials.rawId)
-            : credentials.rawId
-    }
-
-    if ("response" in credentials) {
-        // Forcefully transform all ArrayBuffers in the credentials response as BASE64 strings.
-        response.response = Object.fromEntries(
-            Object.entries(credentials.response).map(([index, value]): [string, string] => {
-                return [index, isArrayBuffer(value) ? arrayToBase64UrlString(value) : value]
-            })
-        )
-    }
-
-    return response;
-}
-
-/**
- * Transform a string into Uint8Array instance.
- */
-function base64UrlToUint8Array(input: string): Uint8Array {
-    // Pad the input and replace the safe characters to unsafe characters
-    input = (input + "=".repeat((4 - input.length % 4) % 4))
-        .replace(/-/g, "+")
-        .replace(/_/g, "/")
-
-    return new TextEncoder().encode(input)
-}
-
-/**
- * Encodes an array of bytes to a BASE64 URL string
- */
-function arrayToBase64UrlString(arrayBuffer: ArrayBuffer): string {
-    return btoa(new TextDecoder().decode(arrayBuffer))
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=/g, "")
-}
+import {startAuthentication, startRegistration} from "@simplewebauthn/browser";
+import type {AuthenticationResponseJSON, RegistrationResponseJSON} from "@simplewebauthn/types";
 
 /**
  * Create a new Error with a name and message.
  */
-function newError(name: string, message: string): Error {
+function newError(name: string, message: string, cause: unknown = undefined): Error {
     const error = new Error(message)
 
     error.name = name
+    error.cause = cause
 
     return error
 }
@@ -161,20 +95,17 @@ function webpass(config: Partial<Config> = {}): Webpass {
             throw newError("InvalidAttestationResponse", "The server responded with invalid or empty credential creation options.")
         }
 
-        const credentials: Credential | null = await navigator.credentials.create({
-            publicKey: parseServerCreationOptions(attestationOptions)
-        })
+        let credentials: RegistrationResponseJSON
+
+        try {
+            credentials = await startRegistration(attestationOptions)
+        } catch (cause) {
+            throw newError("AttestationCancelled", "The credentials creation was not completed.", cause)
+        }
 
         console.debug("Attestation Credentials Created", credentials);
 
-        // If the user denied the permission, throw an error.
-        if (!credentials) {
-            throw newError("AttestationCancelled", "The credentials creation was cancelled by the user or a timeout.")
-        }
-
-        const result = await wfetch<Record<string, any>>(
-            normalizedResponseOptions, parseOutgoingCredentials(credentials)
-        )
+        const result = await wfetch<Record<string, any>>(normalizedResponseOptions, credentials)
 
         console.debug("Attestation benchmark", bench.stop())
 
@@ -239,22 +170,21 @@ function webpass(config: Partial<Config> = {}): Webpass {
             throw newError("InvalidAssertionResponse", "The server responded with invalid or empty credential request options.")
         }
 
-        // Let the browser sign the challenge with a credential, returning a response
-        const credentials: Credential | null = await navigator.credentials.get({
-            publicKey: parseServerRequestOptions(assertionOptions)
-        })
+        let credentials: AuthenticationResponseJSON
 
-        console.debug("Assertion Credentials Retrieved", assertionOptions)
-
-        // If the user denied the permission, return null
-        if (!credentials) {
-            throw newError("AssertionCancelled", "The credentials request was cancelled by the user or timeout.")
+        try {
+            credentials = await startAuthentication(
+                assertionOptions,
+                normalizedOptions.useAutofill ?? normalizedResponseOptions.useAutofill ?? currentConfig.useAutofill
+            )
+        } catch (cause) {
+            throw newError("AssertionCancelled", "The credentials request was not completed.", cause)
         }
 
+        console.debug("Assertion Credentials Retrieved", credentials)
+
         // Expect an authentication response from the server with the user, credentials, or anything.
-        const result =  await wfetch<Record<string, string>>(
-            normalizedResponseOptions, parseOutgoingCredentials(credentials)
-        )
+        const result = await wfetch<Record<string, string>>(normalizedResponseOptions, credentials)
 
         console.debug("Assertion benchmark", bench.stop())
 
@@ -278,7 +208,8 @@ export default {
     isSupported,
     isNotSupported,
     isUnsupported,
-    isAutomatic,
-    isNotAutomatic,
-    isManual
+    isAutofillable,
+    isNotAutofillable,
+    isPlatformAuthenticator,
+    isNotPlatformAuthenticator
 } as WebpassStatic

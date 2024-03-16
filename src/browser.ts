@@ -1,47 +1,60 @@
+import {
+    browserSupportsWebAuthn,
+    browserSupportsWebAuthnAutofill,
+    platformAuthenticatorIsAvailable
+} from "@simplewebauthn/browser";
+
 /**
  * Check if the browser supports WebAuthn
  *
  * @return {boolean}
  */
-export async function isSupported(): Promise<boolean> {
-    const callback = window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable
-        ?? (async () => false)
-
-    return await callback()
+export function isSupported(): boolean {
+    return browserSupportsWebAuthn()
 }
 
 /**
  * Check if the browser doesn't support WebAuthn
  */
-export async function isNotSupported(): Promise<boolean> {
-    return ! await isSupported()
+export function isNotSupported(): boolean {
+    return ! isSupported()
 }
 
 /**
  * Check if the browser doesn't support WebAuthn
  */
-export async function isUnsupported(): Promise<boolean> {
-    return ! await isSupported()
+export function isUnsupported(): boolean {
+    return ! isSupported()
 }
 
 /**
- * Check if the browser can immediately authenticate without picking credentials.
+ * Check if the browser can show an autofill dialog with existing Passkeys.
+ *
+ * @see https://web.dev/articles/passkey-form-autofill
  */
-export async function isAutomatic(): Promise<boolean> {
-    return await isSupported()
-        && await (window.PublicKeyCredential.isConditionalMediationAvailable ?? (async () => false))()
+export async function isAutofillable(): Promise<boolean> {
+    return isSupported() && await browserSupportsWebAuthnAutofill()
 }
 
 /**
- * Check if the browser cannot immediately authenticate without picking credentials.
+ * Check if the browser cannot show an autofill dialog with existing Passkeys.
+ *
+ * @see https://web.dev/articles/passkey-form-autofill
  */
-export async function isNotAutomatic(): Promise<boolean> {
-    return ! await isAutomatic()
+export async function isNotAutofillable(): Promise<boolean> {
+    return ! await isAutofillable()
 }
 
 /**
- * Check if the browser cannot immediately authenticate without picking credentials.
+ * Check if the browser is on device compatible with Touch ID, Face ID, Windows Hello, or others.
  */
-export async function isManual(): Promise<boolean> {
-    return ! await isAutomatic()
+export async function isPlatformAuthenticator(): Promise<boolean> {
+    return isSupported() && await platformAuthenticatorIsAvailable()
+}
+
+/**
+ * Check if the browser is not on device compatible with Touch ID, Face ID, Windows Hello, or others.
+ */
+export async function isNotPlatformAuthenticator(): Promise<boolean> {
+    return ! await isPlatformAuthenticator()
 }

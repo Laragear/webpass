@@ -397,9 +397,13 @@ const { data, status, error, execute: login } = useLazyAsyncData('webauthn:asser
 
 ## CSRF / XSRF token
 
-Theoretically, there is no need to use [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) for WebAuthn ceremonies. As credentials are mapped to a domain, trying to make a cross-request to an external domain will render them invalid.
+> [!TIP]
+>
+> Theoretically, there is no need to use [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) for WebAuthn ceremonies. As credentials are mapped to a domain, trying to make a cross-request to an external domain will render them invalid.
+>
+> It's recommended to **disable CSRF/XSRF token verification** on WebAuthn routes.
 
-Regardless, you may receive `TokenMismatchException` (`HTTP 419`) responses from the server. To avoid this, Webpass can find a CSRF or XSRF token automatically by setting `findCsrfToken` to `true` in the configuration.
+If you're receiving `TokenMismatchException` (`HTTP 419`) error responses from the server, you can let Webpass find a CSRF or XSRF token automatically by setting `findCsrfToken` to `true` in the configuration.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -424,6 +428,40 @@ const webpass = Webpass.create({
 
 const { success } = await webpass.attest()
 ```
+
+## Autofill Passkey
+
+You may enable a "Conditional UI" served automatically by the browser to pick the correct Passkeys.
+
+In a nutshell, you can show a prompt the moment the user interacts with a login box by retrieving the Assertion Options from the server when the page loads. The assertion will be pending in the background until the user intervenes.
+
+To check if the browser supports Conditional UI before doing it, use the `isAutofillable()` function, and then set `useAutofill` as `true` in any of the assertion configurations, or by [creating a new instance](#ceremony-configuration).
+
+```html
+<script>
+import Webpass from "@laragear/webpass"
+
+if (await Webpass.isAutofillable()) {
+    const { success } = await Webpass.assert({
+        useAutofill: true
+    })
+
+    if (success) {
+        window.location.replace('/dashboard')
+    }
+}
+</script>
+
+<form>
+    <!-- Important to set "webauthn" last in the autocomplete section -->
+    <input type="text" name="username" autocomplete="username webauthn">
+    <input type="password" name="password" autocomplete="password">
+</form>
+```
+
+> [!INFO]
+>
+> More information about how to implement Conditional UI in [web.dev](https://web.dev/articles/passkey-form-autofill).
 
 ## Debugging
 

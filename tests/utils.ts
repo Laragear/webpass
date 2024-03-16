@@ -1,5 +1,5 @@
-import {assert, describe, expect, test} from "vitest"
-import {except, isArrayBuffer, isObjectEmpty, mergeDeep, normalizeOptions, pull} from "../src/utils"
+import {describe, expect, test} from "vitest"
+import {except, isObjectEmpty, mergeDeep, normalizeOptions, pull} from "../src/utils"
 import {CeremonyOptionsWithoutPath} from "../src/types"
 import config from "../src/config"
 
@@ -59,47 +59,6 @@ describe('Except test', () => {
         }
 
         expect(except(object, ...Object.keys(object) as keyof object)).toEqual({})
-    })
-})
-
-describe('Array Buffer test', () => {
-    test('array buffer is array buffer', () => {
-        const value = new ArrayBuffer(8)
-
-        expect(isArrayBuffer(value)).toBe(true)
-    })
-
-    test('Uint8Array is array buffer', () => {
-        const value = new Uint8Array()
-
-        expect(isArrayBuffer(value)).toBe(true)
-    })
-
-    test('array of integers is array buffer', () => {
-        const value = [0, 1, 2, 3, 4]
-
-        expect(isArrayBuffer(value)).toBe(true)
-    })
-
-    test('array of binaries is array buffer', () => {
-        const value = [0x45, 0x46, 0x47]
-
-        expect(isArrayBuffer(value)).toBe(true)
-    })
-
-    test('not array buffers are not array buffers', () => {
-        expect(isArrayBuffer({})).toBe(false)
-        expect(isArrayBuffer([])).toBe(false)
-        expect(isArrayBuffer(['a'])).toBe(false)
-        expect(isArrayBuffer('a')).toBe(false)
-        expect(isArrayBuffer(0x45)).toBe(false)
-        expect(isArrayBuffer(5)).toBe(false)
-        expect(isArrayBuffer(() => {})).toBe(false)
-        expect(isArrayBuffer(NaN)).toBe(false)
-        expect(isArrayBuffer(Infinity)).toBe(false)
-        expect(isArrayBuffer(new Uint16Array)).toBe(false)
-        expect(isArrayBuffer(new Uint32Array)).toBe(false)
-        expect(isArrayBuffer(new Int8Array)).toBe(false)
     })
 })
 

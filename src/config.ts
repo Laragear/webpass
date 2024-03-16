@@ -11,6 +11,7 @@ export default {
     baseURL: undefined,
     findCsrfToken: false,
     findXsrfToken: false,
+    useAutofill: undefined,
     routes: {
         attestOptions: "/auth/attest-options",
         attest: "/auth/attest",

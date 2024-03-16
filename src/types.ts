@@ -11,6 +11,7 @@ export interface Config extends Partial<FetchOptions<"json">> {
     routes: Endpoints,
     findCsrfToken: boolean|string,
     findXsrfToken: boolean|string,
+    useAutofill: boolean|undefined,
     method: "get" | "post" | string,
     redirect: RequestRedirect,
     baseURL: string | undefined,
@@ -53,12 +54,13 @@ export interface Webpass {
 
 export interface WebpassStatic extends Webpass {
     create: (config?: Partial<Config>) => Webpass,
-    isSupported: () => Promise<boolean>,
-    isNotSupported: () => Promise<boolean>,
-    isUnsupported: () => Promise<boolean>,
-    isAutomatic: () => Promise<boolean>,
-    isNotAutomatic: () => Promise<boolean>,
-    isManual: () => Promise<boolean>,
+    isSupported: () => boolean,
+    isNotSupported: () => boolean,
+    isUnsupported: () => boolean,
+    isAutofillable: () => Promise<boolean>,
+    isNotAutofillable: () => Promise<boolean>,
+    isPlatformAuthenticator: () => Promise<boolean>,
+    isNotPlatformAuthenticator: () => Promise<boolean>,
 }
 
 export interface ServerPublicKeyCredentialCreationOptions extends Omit<PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'> {

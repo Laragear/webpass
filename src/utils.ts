@@ -29,18 +29,6 @@ export function except<T extends Record<string, any>, K extends Array<keyof T>>(
 }
 
 /**
- * Check if a value is an Array Buffer, like an Uint8Array, or a plain array
- */
-export function isArrayBuffer(value: any): boolean {
-    return typeof value === "object"
-        && (
-            value instanceof ArrayBuffer ||
-            value instanceof Uint8Array ||
-            (Array.isArray(value) && typeof value[0] === "number")
-        )
-}
-
-/**
  * Check if an object is a non-empty object.
  */
 export function isObjectEmpty(value: any): boolean {
