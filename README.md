@@ -53,10 +53,10 @@ Then, in your project, you can import is as a module.
 import Webpass from "@laragear/webpass"
 ```
 
-If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you may prefer to use a CDN directly into your HTML web page.
+If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you may prefer to use a CDN directly into your HTML web page, like using [JSDelivr](https://cdn.jsdelivr.net/npm/@laragear/webpass@latest/dist/webpass.js) or [unpkg](https://unpkg.com/@laragear/webpass@latest/dist/webpass.js).
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@2/dist/webpass.js" defer></script>
 
 <script>
     const assert = async () => await Webpass.assert("/auth/assert-options", "/auth/assert")
@@ -99,7 +99,7 @@ if (Webpass.isUnsupported()) {
 
 > [!WARNING]
 >
-> These functions check if WebAuthn is supported, and also if user verification (TouchID, FaceID, Windows Hello, fingerprint, PIN or else) is supported. If there is no user verification, WebAuthn is unsupported.
+> These functions check if WebAuthn is supported, and also if user verification (TouchID, FaceID, Windows Hello, fingerprint, PIN or else) is supported. If the user cannot be verified, WebAuthn should be considered unsupported.
 >
 > In these cases, **consider the context as insecure**.
 
@@ -500,7 +500,7 @@ Yes, import it as a script in your HTML `<header>` tag.
 ```html
 <head>
     <!-- ... -->
-    <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@2/dist/webpass.js" defer></script>
 </head>
 ```
 
