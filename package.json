@@ -48,7 +48,7 @@
     "@types/web": "^0.0.140",
     "@vitest/coverage-v8": "^1.0.4",
     "eslint": "^8.55.0",
-    "happy-dom": "^13.5.0",
+    "happy-dom": "^15.10.2",
     "rollup": "^4.12.0",
     "tslib": "^2.6.2",
     "vitest": "^1.0.4"
