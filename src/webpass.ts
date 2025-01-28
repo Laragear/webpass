@@ -64,12 +64,12 @@ function webpass(config: Partial<Config> = {}): Webpass {
         } catch (error) {
             return {...result, error}
         } finally {
-            result.success = result.error === undefined
-        }
+            // Here we will just short-circuit the ID from the response as convenience, if it exists.
+            if (typeof result.data === "object") {
+                result.id = result.data?.id || result.data?.uuid || undefined
+            }
 
-        // Here we will just short-circuit the ID from the response as convenience, if it exists.
-        if (typeof result.data === "object") {
-            result.id = result.data?.id || result.data?.uuid
+            result.success = result.error === undefined
         }
 
         return result
@@ -131,20 +131,20 @@ function webpass(config: Partial<Config> = {}): Webpass {
         } catch (error) {
             return {...result, error}
         } finally {
-            result.success = result.error === undefined
-        }
+            // Try to set the user and token from the data received, or just the token if it's a string.
+            if (typeof result.data === "object") {
+                result.user = typeof result.data.user === "object" ? result.data.user : result.data
+                result.token = result.data?.token || result.data?.jwt
 
-        // Try to set the user and token from the data received, or just the token if it's a string.
-        if (typeof result.data === "object") {
-            result.user = typeof result.data.user === "object" ? result.data.user : result.data
-            result.token = result.data?.token || result.data?.jwt
-
-            // If we couldn't get the token, try the user object if it is an object
-            if (!result.token && typeof result.user === "object") {
-                result.token = result.user?.token || result.user?.jwt
+                // If we couldn't get the token, try the user object if it is an object
+                if (!result.token && typeof result.user === "object") {
+                    result.token = result.user?.token || result.user?.jwt
+                }
+            } else if (typeof result.data === "string") {
+              result.token = result.data
             }
-        } else if (typeof result.data === "string") {
-            result.token = result.data
+
+            result.success = result.error === undefined
         }
 
         return result
