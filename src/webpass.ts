@@ -85,6 +85,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
         const normalizedOptions = normalizeOptions(options, currentConfig, "attestOptions")
         const normalizedResponseOptions = normalizeOptions(response, currentConfig, "attest")
 
+        console.debug("Attestation Options Sending", normalizedOptions)
+
         // Retrieve the attestation options from the server
         const attestationOptions: ServerPublicKeyCredentialCreationOptions | undefined = await wfetch<ServerPublicKeyCredentialCreationOptions | undefined>(normalizedOptions)
 
@@ -105,7 +107,11 @@ function webpass(config: Partial<Config> = {}): Webpass {
 
         console.debug("Attestation Credentials Created", credentials);
 
+        console.debug("Attestation Response Sending", normalizedResponseOptions)
+
         const result = await wfetch<Record<string, any>>(normalizedResponseOptions, credentials)
+
+        console.debug("Attestation Response Received", result)
 
         console.debug("Attestation benchmark", bench.stop())
 
@@ -160,6 +166,8 @@ function webpass(config: Partial<Config> = {}): Webpass {
         const normalizedOptions = normalizeOptions(options, currentConfig, "assertOptions")
         const normalizedResponseOptions = normalizeOptions(response, currentConfig, "assert")
 
+        console.debug("Assertion Options Sending", normalizedOptions)
+
         // Get the assertion challenge from the server
         const assertionOptions: ServerPublicKeyCredentialRequestOptions | undefined = await wfetch<ServerPublicKeyCredentialRequestOptions | undefined>(normalizedOptions)
 
@@ -183,8 +191,12 @@ function webpass(config: Partial<Config> = {}): Webpass {
 
         console.debug("Assertion Credentials Retrieved", credentials)
 
+        console.debug("Assertion Response Sending", normalizedResponseOptions)
+
         // Expect an authentication response from the server with the user, credentials, or anything.
         const result = await wfetch<Record<string, string>>(normalizedResponseOptions, credentials)
+
+        console.debug("Assertion Response Received", result)
 
         console.debug("Assertion benchmark", bench.stop())
 
