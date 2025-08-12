@@ -1,4 +1,4 @@
-import {CeremonyOptions, CeremonyOptionsWithoutPath, Config} from "./types"
+import type {CeremonyOptions, CeremonyOptionsWithoutPath, Config} from "./types"
 
 /**
  * Extracts a single key for the object.
