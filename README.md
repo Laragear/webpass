@@ -167,7 +167,23 @@ The attestation object contains:
 - `data`, the data received from the successful attestation
 - `error`, if the attestation was unsuccessful by an error
 
-While the `data` object will contain the response from the attestation server, most servers won't return body content on `HTTP 201` or `HTTP 201` codes. Others will return the ID of the credential created for redirection (like `126` or a UUID). For that matter, you can use the `credential` alias, or the `id` alias if you want to extract only the ID or UUID property.
+While the `data` object will contain the response from the attestation server, most servers won't return body content on `HTTP 201` or `HTTP 201` codes as there is nothing else to do.
+
+```js
+import Webpass from "@laragear/webpass"
+import { useToast } from "my-toast-library"
+
+const { success, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
+
+useToast().push(success
+    ? { title: "Passkey created", color: "green" }
+    : { title: "Something happened. Try again", color: "red" }
+})
+
+if (error) console.error(error)
+```
+
+Others servers may return the ID of the credential created for redirection (like `126` or a UUID). In that case, you can use the `credential` alias, or the `id` alias if you want to extract only the ID or UUID property. For example, you may redirect the user to the newly created credential by its ID.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -201,7 +217,7 @@ The assertion object contains:
 
 The first request to the server is the most important. If your server instructed the authenticator to create [discoverable credentials](https://www.w3.org/TR/webauthn-2/#enum-residentKeyRequirement) (called "Resident Keys") in the device, you won't need anything more than the path to receive the assertion options as the device will automatically find the correct one.
 
-Otherwise, you may need to point out the user identifier, like its email. This way the server can find the Credentials IDs for the user, so the Authenticator can pick up the correct Non-Resident Key to authenticate. For that, you may [configure the ceremony](#ceremony-configuration) with a body your server can pick up.
+Otherwise, you may need to point out the user identifier, like its email. This way the server can find the Credentials IDs for the user, and the Authenticator can pick up the correct Non-Resident Key to authenticate. For that, you may [configure the ceremony](#ceremony-configuration) with a body your server can pick up.
 
 ```js
 import Webpass from "@laragear/webpass"
