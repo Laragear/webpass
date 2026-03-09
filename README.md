@@ -71,7 +71,7 @@ Alternatively, you may also use the `webpass.mjs` if you're using [ECMAScript mo
 
 ```html
 <script type="module" async>
-import Webpass from "https://cdn.jsdelivr.net/npm/@laragear/webpass@1/dist/webpass.mjs"
+import Webpass from "https://cdn.jsdelivr.net/npm/@laragear/webpass@2/dist/webpass.mjs"
 
 Window.assert = async () => await Webpass.assert("/auth/assert-options", "/auth/assert")
 </script>
