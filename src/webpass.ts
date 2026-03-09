@@ -23,7 +23,7 @@ import defaultConfig from "./config"
 import wfetch from "./wfetch"
 import benchmark from "./benchmark"
 import {startAuthentication, startRegistration} from "@simplewebauthn/browser";
-import type {AuthenticationResponseJSON, RegistrationResponseJSON} from "@simplewebauthn/types";
+import type {AuthenticationResponseJSON, RegistrationResponseJSON} from "@simplewebauthn/browser";
 
 /**
  * Create a new Error with a name and message.
@@ -36,7 +36,6 @@ function newError(name: string, message: string, cause: unknown = undefined): Er
 
     return error
 }
-
 
 /**
  * Create a new Webpass instance.
@@ -100,6 +99,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
         let credentials: RegistrationResponseJSON
 
         try {
+            // @ts-ignore
             credentials = await startRegistration(attestationOptions)
         } catch (cause) {
             throw newError("AttestationCancelled", "The credentials creation was not completed.", cause)
@@ -181,6 +181,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
         let credentials: AuthenticationResponseJSON
 
         try {
+            // @ts-ignore
             credentials = await startAuthentication(
                 assertionOptions,
                 normalizedOptions.useAutofill ?? normalizedResponseOptions.useAutofill ?? currentConfig.useAutofill

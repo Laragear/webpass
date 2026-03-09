@@ -198,6 +198,25 @@ describe("Webpass test", () => {
         })
     })
 
+    test('attest uses empty final response', async () => {
+        // @ts-ignore
+        vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
+            return options.path === '/auth/attest-options' ? attestOptions : undefined
+        })
+
+        mock.startRegistration = () => attestResponse
+
+        const result = await Webpass.attest()
+
+        expect(result).toEqual({
+            credentials: undefined,
+            data: undefined,
+            error: undefined,
+            id: undefined,
+            success: true
+        })
+    })
+
     test('attest error if empty attestation options', async () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation(() => {})
@@ -220,21 +239,22 @@ describe("Webpass test", () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation(() => attestOptions)
 
-        mock.startRegistration = () => {
-            throw new Error('test')
-        }
+        const cause = new Error('test')
+
+        mock.startRegistration = () => { throw cause }
 
         const result = await Webpass.attest()
 
         const error = new Error('The credentials creation was not completed.')
         error.name = 'AttestationCancelled'
+        error.cause = cause
 
         expect(result).toEqual({
             credentials: undefined,
             data: undefined,
-            error: error,
             id: undefined,
-            success: false
+            success: false,
+            error: error,
         })
     })
 
@@ -409,14 +429,15 @@ describe("Webpass test", () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation(() => assertOptions)
 
-        mock.startAuthentication = () => {
-            throw new Error('test')
-        }
+        const cause = new Error('test')
+
+        mock.startAuthentication = () => { throw cause }
 
         const result = await Webpass.assert()
 
         const error = new Error('The credentials request was not completed.')
         error.name = 'AssertionCancelled'
+        error.cause = cause
 
         expect(result).toEqual({
             user: undefined,
