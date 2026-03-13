@@ -83,7 +83,7 @@ Window.assert = async () => await Webpass.assert("/auth/assert-options", "/auth/
 
 ## Usage
 
-First, you should check if the browser supports WebAuthn (also called _Passkeys_) and [user verification](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/isUserVerifyingPlatformAuthenticatorAvailable_static). You can easily do it with `isSupported()` and `isUnsupported()`.
+First, you should check if the browser supports WebAuthn (also called _Passkeys_) and [user verification](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredential/isUserVerifyingPlatformAuthenticatorAvailable_static). You can easily do it with `isSupported()` and `isNotSupported()`.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -92,7 +92,7 @@ if (Webpass.isSupported()) {
     return "Your browser supports WebAuthn, just click Login and you're done!"
 }
 
-if (Webpass.isUnsupported()) {
+if (Webpass.isNotSupported()) {
     return "Your browser doesn't support WebAuthn."
 }
 ```
@@ -110,7 +110,7 @@ The most straightforward way to use Webpass is to execute `Webpass.attest()` and
 ```js
 import Webpass from "@laragear/webpass"
 
-// Create new credentials for a logged in user
+// Create new credentials for a logged in user.
 const { credentials, success, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
 
 // Check the credentials for a logged out user
@@ -131,7 +131,7 @@ There are a lot of assumptions with the simple approach:
 - Includes credentials (Cookies, Bearer Token) as long these are in the same domain ("same-origin").
 - Uses JSON headers (`Content-type` and `Accept` as `application/json`)
 
-You may also change the ceremony paths by your custom one.
+You may also change the ceremony paths the ones your server uses.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -147,13 +147,13 @@ const { user, success, error, pending } = await Webpass.assert(
 )
 ```
 
-Of course, this may be too simple for your use case. Luckily, you can use a custom configuration for both ceremonies through objects, or even use a [global configuration](#configuration).
+Of course, this may be too simple for your use case. Luckily, you can use a custom configuration for both ceremonies through configuration objects, or even use a [global configuration](#configuration).
 
 ### Attestation
 
 Attestation is the _ceremony_ to create credentials. In a nutshell, the browser retrieves _how_ to create a credential from the server, creates it (as a private key), and the server receives the generated public key to store.
 
-Start an attestation using `attest()`, with the paths where the attestation options are retrieved, and the attestation response is sent back.
+Start an attestation using `attest()`, with the paths where the attestation options are retrieved, and where the attestation response is sent back.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -182,11 +182,15 @@ if (success) {
 throw error
 ```
 
+> [!NOTE]
+>
+> Usually, attestation is done with the user already logged in, so the servers can know who to create the credentials for. It's possible to do it with a new user by passing some additional data like its email, but that requires special setup server-side.
+
 ### Assertion
 
-Assertion is the _ceremony_ to check if a device has the correct credential. In a nutshell, the authenticator asks the server for a challenge through the browser, the authenticator resolves that challenge with the private key, and the server checks the resolved challenge is correct.
+Assertion is the _ceremony_ to check if a device has the correct credential. In a nutshell, the authenticator asks the server for a challenge through the browser, the authenticator resolves that challenge with the private key, and the server checks the resolved challenge is correct with its public key.
 
-Start an assertion using the `assert()` method, with the paths where the assertion options are retrieved, and the assertion response is sent back.
+Start an assertion using the `assert()` method, with the paths where the assertion options are retrieved, and where the assertion response is sent back.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -242,7 +246,7 @@ Both Attestation and Assertion ceremonies require two requests to the server: on
 
 For example, there may be scenarios where you will want to add data to one of these requests, or both. You may add additional data to the server requests using an object with the endpoint name, the headers, the body, and if the fetch should include credentials (like cookies or header tokens), through an object. All of these options are forwarded to [ofetch](#oh-my-fetch).
 
-This works for both Attestation and Assertion, and available for both requests of each ceremony.
+This works for both Attestation and Assertion and is available for both requests of each ceremony.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -365,7 +369,7 @@ const { credentials, success, error } = await webpass.attest()
 
 ## Using with Nuxt
 
-You can easily create a lazy WebAuthn ceremony using `useLazyAsyncData`, and the `raw` method of Webpass.
+You can easily create a lazy WebAuthn ceremony using [`useLazyAsyncData`](https://nuxt.com/docs/4.x/api/composables/use-lazy-async-data), and the `raw` method of Webpass.
 
 ```vue
 <template>
@@ -432,7 +436,9 @@ const { success } = await webpass.attest()
 
 ## Autofill Passkey
 
-You may enable a "Conditional UI" served automatically by the browser to pick the correct Passkeys.
+You may enable a ["Conditional UI"](https://web.dev/articles/passkey-form-autofill) served automatically by the browser to pick the correct Passkeys.
+
+[![Conditional UI (web.dev)](https://web.dev/static/articles/passkey-form-autofill/video/form-autofill-v2.mp4)
 
 In a nutshell, you can show a prompt the moment the user interacts with a login box by retrieving the Assertion Options from the server when the page loads. The assertion will be pending in the background until the user intervenes.
 
@@ -492,7 +498,7 @@ Enabling debug messages in your console would yield entries like this:
 
 * **Does this store user credentials?**
 
-No, this is an WebAuthn API helper for browsers. It's your server the responsible to store and check credentials.
+No, this is a WebAuthn API helper for browsers. IYour server is responsible to store and check credentials.
 
 * **Can I use this on a plain HTML page?**
 
@@ -507,7 +513,7 @@ Yes, import it as a script in your HTML `<header>` tag.
 
 * **Hey, this doesn't work!**
 
-Check your browser's Console for any errors. Most of the time, errors come up from the server or the authenticator.
+Check your browser's Console for any errors. Most of the time, errors come up from the server or the authenticator itself.
 
 * **Can I serialize the Credentials in another format, like a giant BASE64 string?**
 
@@ -517,19 +523,21 @@ WebAunthn 3.0 _may_ include automatic serialization and deserialization.
 
 * **I get `TokenMismatch` HTTP 419 errors in my app. What I'm doing wrong?**
 
-If you're using Laravel, check there is a [CSRF or XSRF token](https://laravel.com/docs/10.x/csrf) in your `<meta>` tags, `<input>` tags, or cookies.
+The `POST` request for the ceremonies come without CSRF/XSRF token. [You can add them](#csrf--xsrf-token), or [disable them in your server](#csrf--xsrf-token) for these specific routes.
+
+If you're using Laravel, check there is a [CSRF or XSRF token](https://laravel.com/docs/13.x/csrf) in your `<meta>` tags, `<input>` tags, or cookies.
 
 * **I get `The token must be an CSRF (40 characters) or XSRF token` in the console every time I try to use Webpass!**
 
-It's because Webpass its trying (and failing) to find a valid token. You may [issue your own](#csrf--xsrf-token), or [disable it all together](#csrf--xsrf-token).
+It's because Webpass is trying (and failing) to find a valid token. You may [issue your own](#csrf--xsrf-token), or [disable it all together](#csrf--xsrf-token).
 
 * **How do I enable debug messages?**
 
-By default, browsers don't show debug messages in the Console. To enable that, enable/raise messages levels to "debug". Usually that option is shown as "Levels" or "Filters" on the top of the console pane.
+By default, browsers don't show debug messages in the Console. To enable that, enable/raise messages levels to "debug". Usually that option is shown as "Levels" or "Filters" on the top of the console panel.
 
 * **How do I decode the BASE64 URL strings incoming to the server?**
 
-That depends on your server app and language which is written. Take this TypeScript example:
+That depends on your server app and the language which is written. Take this TypeScript example:
 
 ```typescript
 import { Assert } from 'some-webauthn-library'
@@ -559,4 +567,6 @@ function assert(request: object): boolean {
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
+This specific package version is licensed under the terms of the [MIT License](LICENSE.md), at the time of publishing.
+
+[Laravel](https://laravel.com) is a Trademark of [Taylor Otwell](https://github.com/TaylorOtwell/). Copyright © 2011–2026 Laravel LLC.
