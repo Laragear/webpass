@@ -53,7 +53,7 @@ Then, in your project, you can import is as a module.
 import Webpass from "@laragear/webpass"
 ```
 
-If you're not using a bundler like Webpack, Rollup, Parcel, or any other, you may prefer to use a CDN directly into your HTML web page, like using [JSDelivr](https://cdn.jsdelivr.net/npm/@laragear/webpass@latest/dist/webpass.js) or [unpkg](https://unpkg.com/@laragear/webpass@latest/dist/webpass.js).
+If you're not using a bundler like Webpack, Vite, Rollup, Parcel, Turbopack, esbuild, Rspack, Bun or any other, you may prefer to use a CDN directly into your HTML web page, like using [JSDelivr](https://cdn.jsdelivr.net/npm/@laragear/webpass@latest/dist/webpass.js) or [unpkg](https://unpkg.com/@laragear/webpass@latest/dist/webpass.js).
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@2/dist/webpass.js" defer></script>
