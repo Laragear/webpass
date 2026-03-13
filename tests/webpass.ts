@@ -198,7 +198,7 @@ describe("Webpass test", () => {
         })
     })
 
-    test('attest uses empty final response', async () => {
+    test('attest returns credentials if empty final response', async () => {
         // @ts-ignore
         vi.mocked(wfetch).mockImplementation((options: { path: string }) => {
             return options.path === '/auth/attest-options' ? attestOptions : undefined
@@ -209,10 +209,10 @@ describe("Webpass test", () => {
         const result = await Webpass.attest()
 
         expect(result).toEqual({
-            credentials: undefined,
-            data: undefined,
+            credentials: attestResponse,
+            data: attestResponse,
             error: undefined,
-            id: undefined,
+            id: attestResponse.id,
             success: true
         })
     })

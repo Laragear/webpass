@@ -115,7 +115,7 @@ function webpass(config: Partial<Config> = {}): Webpass {
 
         console.debug("Attestation benchmark", bench.stop())
 
-        return result
+        return result ?? credentials
     }
 
     /**

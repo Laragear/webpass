@@ -111,7 +111,7 @@ The most straightforward way to use Webpass is to execute `Webpass.attest()` and
 import Webpass from "@laragear/webpass"
 
 // Create new credentials for a logged in user
-const { credential, success, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
+const { credentials, success, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
 
 // Check the credentials for a logged out user
 const { user, success, error } = await Webpass.assert("/auth/assert-options", "/auth/assert")
@@ -125,7 +125,7 @@ const { user, success, error } = await Webpass.assert({
 })
 ```
 
-There is a lot of assumptions with the simple approach:
+There are a lot of assumptions with the simple approach:
 
 - It uses the site host as the base URL.
 - Includes credentials (Cookies, Bearer Token) as long these are in the same domain ("same-origin").
@@ -137,7 +137,7 @@ You may also change the ceremony paths by your custom one.
 import Webpass from "@laragear/webpass"
 
 // Register credentials:
-const { credential, success, error } = await Webpass.attest(
+const { credentials, success, error } = await Webpass.attest(
     "/webauthn/attest/options", "/webauthn/attest"
 )
 
@@ -158,32 +158,17 @@ Start an attestation using `attest()`, with the paths where the attestation opti
 ```js
 import Webpass from "@laragear/webpass"
 
-const { success, data, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
+const { credentials, success, error, id } = await Webpass.attest("/auth/attest-options", "/auth/attest")
 ```
 
 The attestation object contains:
 
+- `credentials`, the data received from the successful attestation
 - `success`, if the attestation was successful
-- `data`, the data received from the successful attestation
 - `error`, if the attestation was unsuccessful by an error
+- `id`, either the `id` or `uuid` property of the `credentials` object, if available
 
-While the `data` object will contain the response from the attestation server, most servers won't return body content on `HTTP 201` or `HTTP 201` codes as there is nothing else to do.
-
-```js
-import Webpass from "@laragear/webpass"
-import { useToast } from "my-toast-library"
-
-const { success, error } = await Webpass.attest("/auth/attest-options", "/auth/attest")
-
-useToast().push(success
-    ? { title: "Passkey created", color: "green" }
-    : { title: "Something happened. Try again", color: "red" }
-})
-
-if (error) console.error(error)
-```
-
-Others servers may return the ID of the credential created for redirection (like `126` or a UUID). In that case, you can use the `credential` alias, or the `id` alias if you want to extract only the ID or UUID property. For example, you may redirect the user to the newly created credential by its ID.
+Servers may choose not to return body content with `HTTP 201` or `HTTP 204` responses. The `credentials` object will contain either the contents of the server response or, if the response is empty, the registration response. You can use the `credentials` object, or the `id` alias if you want to extract only the ID or UUID property, to handle the response. For example, you may redirect the user to the newly created credential by its ID.
 
 ```js
 import Webpass from "@laragear/webpass"
@@ -375,7 +360,7 @@ const webpass = Webpass.create({
 })
 
 // Create an attest in other part of the application, as the proper path and config are already loaded.
-const { credential, success, error } = await webpass.attest()
+const { credentials, success, error } = await webpass.attest()
 ```
 
 ## Using with Nuxt
