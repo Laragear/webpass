@@ -2,6 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/@laragear%2Fwebpass.svg)](https://badge.fury.io/js/@laragear%2Fwebpass)
 [![codecov](https://codecov.io/gh/Laragear/webpass/graph/badge.svg?token=UlHjKBjZhg)](https://codecov.io/gh/Laragear/webpass)
+[![Maintainability](https://qlty.sh/gh/Laragear/projects/webpass/maintainability.svg)](https://qlty.sh/gh/Laragear/projects/webpass)
 [![Last stable run](https://github.com/Laragear/webpass/actions/workflows/test.yaml/badge.svg)](https://github.com/Laragear/webpass/actions/workflows/test.yaml)
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=Laragear_webpass&metric=alert_status)](https://sonarcloud.io/dashboard?id=Laragear_webpass)
 
