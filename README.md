@@ -1,3 +1,7 @@
+# This package has been superseded by [@laravel/passkeys](https://www.npmjs.com/package/@laravel/passkeys)
+
+This package is no longer maintaned due to a release of an official implementation.
+
 # Webpass
 
 [![npm version](https://badge.fury.io/js/@laragear%2Fwebpass.svg)](https://badge.fury.io/js/@laragear%2Fwebpass)

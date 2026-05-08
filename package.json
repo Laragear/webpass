@@ -1,7 +1,7 @@
 {
   "name": "@laragear/webpass",
   "version": "2.1.2",
-  "description": "The most simple WebAuthn (Passkeys) helper for browsers.",
+  "description": "DEPRECTADED. Use @laravel/passkeys instead.",
   "repository": {
     "type": "git",
     "url": "https://github.com/Laragear/webpass.git"
